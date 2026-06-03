@@ -3,11 +3,12 @@
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { razorpay } from '@/lib/razorpay';
+import { getRazorpay } from '@/lib/razorpay';
 import { generateOrderNumber } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   try {
+    const razorpay = getRazorpay();
     const body = await request.json();
     const { amount, items, address } = body;
 
