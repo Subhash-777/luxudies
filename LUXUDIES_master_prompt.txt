@@ -1,0 +1,36 @@
+# Master Prompt for LUXUDIES Implementation
+
+Build a premium, mobile-first luxury jewelry ecommerce website for LUXUDIES using `LUXUDIES_plan.md` as the single source of truth. The experience must feel elegant, modern, and highly convertible, with pearl-white and gold branding, liquid-glass UI, subtle 3D motion, and a fast mobile checkout flow.
+
+Use the attached logo and reference images as the visual and brand foundation. Create a responsive website that looks exceptional on mobile first, then scales beautifully to desktop.
+
+## Core requirements
+- Implement the site with Next.js, Tailwind CSS, Framer Motion, and Three.js or React Three Fiber.
+- Use Supabase for the full backend: authentication, database, storage, realtime updates, edge functions, and database webhooks.
+- Integrate Razorpay Standard Checkout for payments, with secure server-side order creation, signature verification, and payment status handling.
+- Include sign-in, sign-up, OTP or email login, profile, wishlist, cart, order history, and order tracking.
+- Build a polished admin flow for product management, order updates, and customer support.
+
+## Design direction
+- Follow the pearl-white and gold palette defined in the plan.
+- Use premium typography, soft shadows, glass cards, and refined spacing.
+- Keep all interactions minimal, elegant, and luxurious.
+- Make the UI compact, fast, and highly usable on mobile devices.
+
+## Motion and visuals
+- Add subtle 3D product motion for the hero section and selected product pages.
+- Create smooth scroll-triggered animations, floating effects, parallax depth, and glass morph transitions.
+- Also generate dedicated images for website animations and motion concepts that can be used as references for hero motion, section transitions, and visual storytelling.
+- Generate sample product images for the website using the same visual style, so they can be replaced later with real product photos.
+- Make the sample product visuals consistent with LUXUDIES branding: pearl-white background, warm gold accents, luxury editorial lighting, and premium jewelry presentation.
+
+## Content and conversion
+- Write all homepage, product, category, FAQ, checkout, and order-tracking content in a luxury brand voice.
+- Highlight trust factors, combo offers, gifting value, and product benefits.
+- Optimize for conversion with clear CTAs, fast purchase paths, and social proof.
+
+## Output expectations
+- Deliver a production-ready website structure.
+- Include reusable components, page sections, and responsive layouts.
+- Provide clean implementation logic, performance-friendly media handling, and mobile-first behavior.
+- Ensure the final product feels like a premium jewelry brand with strong business attraction and smooth user flow.

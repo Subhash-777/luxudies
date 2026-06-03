@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LUXUDIES — Luxury Jewellery Ecommerce
 
-## Getting Started
+A premium, mobile-first luxury jewelry ecommerce website built for **LUXUDIES**. Features a pearl-white & gold design system, liquid-glass UI, subtle 3D motion, and a fast mobile checkout flow.
 
-First, run the development server:
+## 🚀 Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Framework:** [Next.js 16](https://nextjs.org/) (App Router)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)
+- **Animations:** [Framer Motion](https://www.framer.com/motion/)
+- **Backend & Auth:** [Supabase](https://supabase.com/) (PostgreSQL, Auth, Storage)
+- **Payments:** [Razorpay](https://razorpay.com/) (Standard Checkout)
+- **State Management:** [Zustand](https://zustand-demo.pmnd.rs/) (Cart & Wishlist with localStorage persistence)
+- **Icons:** [Lucide React](https://lucide.dev/)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 💎 Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Storefront:** Home, Shop All, Product Detail, Standalone Static Pages (About, Policies, Contact, FAQ).
+- **Shopping:** Cart drawer, Wishlist, Category Filtering, Sort.
+- **Checkout:** Fully integrated Razorpay checkout with address collection (Name, Phone, Tamil Nadu cities).
+- **Authentication:** Email/Password, Phone OTP, Google OAuth.
+- **Account:** Profile management, Order History, Saved Addresses, Settings.
+- **Tracking:** Animated order tracking timeline.
+- **Admin Panel:** Dashboard, Products/Orders/Customers/Banners CRUD interfaces.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Setup & Local Development
 
-## Learn More
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Environment Configuration:**
+   Copy `.env.example` (or setup based on your `.env.local` if available) with your Supabase and Razorpay credentials:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_your_key
+   RAZORPAY_KEY_SECRET=your_secret
+   
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **Database Setup (Supabase):**
+   - Run the SQL schema found in `supabase/schema.sql`.
+   - Setup Storage buckets using `supabase/storage.sql`.
+   - Check `walkthrough.md` (or the guide provided during setup) for step-by-step Supabase provider configs.
 
-## Deploy on Vercel
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🚀 Vercel Deployment Compatibility
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is 100% compatible with Vercel deployment:
+- Uses standard Next.js App Router.
+- Build command is `next build`.
+- Requires setting the exact same Environment Variables in your Vercel project settings.
+- Supabase edge functions/middleware are correctly configured using `@supabase/ssr`.
+
+---
+
+*Crafted to be cherished. Designed to be you.*
