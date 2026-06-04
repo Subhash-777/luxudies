@@ -21,6 +21,18 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
+  // ===== AUTO-FIX: Catch auth codes that land on the wrong page =====
+  // If a ?code= param exists on any page OTHER than /auth/callback,
+  // redirect it to /auth/callback so the session exchange happens properly.
+  const authCode = request.nextUrl.searchParams.get('code');
+  if (authCode && !request.nextUrl.pathname.startsWith('/auth/callback')) {
+    const callbackUrl = request.nextUrl.clone();
+    callbackUrl.pathname = '/auth/callback';
+    // Preserve all query params (code, redirect, etc.)
+    console.log('[AUTH] Caught auth code on wrong page, redirecting to /auth/callback');
+    return NextResponse.redirect(callbackUrl);
+  }
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -58,29 +70,42 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // Check admin role — use try/catch in case table doesn't exist or RLS blocks
+    // Check admin role — use service role key to bypass RLS
     try {
-      const { data: profile, error } = await supabase
+      const adminSupabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+          cookies: {
+            getAll() { return []; },
+            setAll() {},
+          },
+        }
+      );
+
+      const { data: profile, error } = await adminSupabase
         .from('users')
         .select('role')
         .eq('id', user.id)
         .single();
 
       if (error) {
-        console.error('Admin role check error:', error.message);
-        // If the query fails (RLS or table issue), deny access
+        console.error('[ADMIN] Role check error:', error.message);
         const url = request.nextUrl.clone();
         url.pathname = '/';
         return NextResponse.redirect(url);
       }
 
       if (profile?.role !== 'admin') {
+        console.log(`[ADMIN] Role is "${profile?.role}" — access denied`);
         const url = request.nextUrl.clone();
         url.pathname = '/';
         return NextResponse.redirect(url);
       }
+
+      console.log('[ADMIN] ✅ Admin access granted');
     } catch (err) {
-      console.error('Admin check failed:', err);
+      console.error('[ADMIN] Exception:', err);
       const url = request.nextUrl.clone();
       url.pathname = '/';
       return NextResponse.redirect(url);
