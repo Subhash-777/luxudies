@@ -76,7 +76,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
       <head>
         {/* Razorpay Script - loaded early for fast checkout */}
         <script src="https://checkout.razorpay.com/v1/checkout.js" async />

@@ -135,6 +135,7 @@ export default function HeroSection() {
                 width={500}
                 height={500}
                 className="relative z-10 rounded-3xl drop-shadow-2xl"
+                style={{ width: '100%', height: 'auto' }}
                 priority
               />
 
