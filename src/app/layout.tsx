@@ -70,6 +70,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
+import SmoothScroller from '@/components/layout/smooth-scroller';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -82,7 +84,9 @@ export default function RootLayout({
         <script src="https://checkout.razorpay.com/v1/checkout.js" async />
       </head>
       <body className="bg-pearl text-espresso font-inter antialiased">
-        {children}
+        <SmoothScroller>
+          {children}
+        </SmoothScroller>
         <Toaster
           position="top-center"
           toastOptions={{

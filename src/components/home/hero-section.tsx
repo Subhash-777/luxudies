@@ -7,6 +7,7 @@
 import { useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Spline from '@splinetool/react-spline';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Shield, Feather, Droplets, Gift, ChevronRight, Lock } from 'lucide-react';
 import Button from '@/components/ui/button';
@@ -129,25 +130,22 @@ export default function HeroSection() {
               {/* Glow behind product */}
               <div className="absolute inset-0 bg-gold-200/20 rounded-full blur-[60px] scale-75" />
 
-              <Image
-                src="/images/products/bow-necklace.jpg"
-                alt="LUXUDIES Signature Bow Pendant Necklace"
-                width={500}
-                height={500}
-                className="relative z-10 rounded-3xl drop-shadow-2xl"
-                style={{ width: '100%', height: 'auto' }}
-                priority
-              />
+              <div className="relative z-10 w-full aspect-square rounded-3xl overflow-hidden bg-pearl-100/30 backdrop-blur-sm border border-gold-400/10 shadow-2xl flex items-center justify-center">
+                 <Spline 
+                   scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" 
+                   className="w-full h-full scale-[1.2]"
+                 />
+              </div>
 
               {/* 3D badge */}
               <motion.div
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1, type: 'spring' }}
-                className="absolute bottom-6 right-2 lg:right-0 bg-white/80 backdrop-blur-md rounded-2xl px-4 py-2.5 shadow-medium border border-gold-400/20 z-20"
+                transition={{ delay: 1.5, type: 'spring', stiffness: 200, damping: 15 }}
+                className="absolute bottom-6 right-2 lg:right-0 bg-white/80 backdrop-blur-md rounded-2xl px-4 py-2.5 shadow-medium border border-gold-400/20 z-20 pointer-events-none"
               >
                 <span className="text-[10px] font-inter font-bold text-gold-500 tracking-wider">
-                  3D
+                  INTERACTIVE 3D
                 </span>
               </motion.div>
             </motion.div>
