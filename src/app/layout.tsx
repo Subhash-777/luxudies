@@ -8,7 +8,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'LUXUDIES — Luxury Jewellery You Deserve',
+    default: 'LUXUDIES | Luxury Jewellery',
     template: '%s | LUXUDIES',
   },
   description:

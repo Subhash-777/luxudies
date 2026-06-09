@@ -65,22 +65,33 @@ export default function HeroSection() {
             style={{ y: yImage, opacity }}
             className="order-1 lg:order-2 relative mx-auto w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[500px]"
           >
-            {/* Pearl-white circular spotlight */}
-            <div className="absolute inset-0 bg-white/40 rounded-full blur-[60px] scale-90" />
+            {/* Elegant Glass Arch Background */}
+            <div className="absolute inset-0 top-4 bottom-4 rounded-t-full rounded-b-3xl bg-gradient-to-b from-white/60 to-white/10 backdrop-blur-2xl border border-white/50 shadow-[0_30px_60px_rgba(58,42,30,0.08)] scale-105" />
             
             {/* Radial gold glow behind floating product */}
-            <div className="absolute inset-0 bg-gold-300/10 rounded-full blur-[80px] scale-110" />
+            <div className="absolute inset-0 bg-gold-300/10 rounded-t-full rounded-b-3xl blur-2xl scale-95" />
 
-            <div className="relative animate-[float_5s_ease-in-out_infinite] z-10">
+            <div className="relative animate-[float_6s_ease-in-out_infinite] z-10 px-6 py-12">
               <Image
                 src="/images/products/bow-necklace.jpg"
                 alt="LUXUDIES Signature Bow Pendant Necklace"
                 width={600}
                 height={600}
-                className="w-full h-auto object-contain drop-shadow-[0_20px_40px_rgba(58,42,30,0.15)]"
+                className="w-full h-auto object-contain drop-shadow-[0_20px_40px_rgba(58,42,30,0.15)] rounded-3xl"
                 priority
               />
             </div>
+
+            {/* Floating Luxury Badge */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1, duration: 0.8 }}
+              className="absolute -bottom-4 -left-4 sm:-left-10 bg-white/90 backdrop-blur-md border border-gold-400/20 px-6 py-4 rounded-2xl shadow-xl z-20"
+            >
+              <p className="font-playfair font-bold text-espresso text-lg mb-0.5">18K Gold Plated</p>
+              <p className="font-inter text-xs text-espresso-300 tracking-wide uppercase">Handcrafted Elegance</p>
+            </motion.div>
           </motion.div>
 
           {/* Text Content (Left on Desktop, Bottom on Mobile) */}
@@ -95,7 +106,11 @@ export default function HeroSection() {
               className="font-playfair text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-espresso leading-[1.15] mb-6 tracking-tight max-w-[15ch] lg:max-w-[12ch]"
             >
               {words.map((word, i) => (
-                <motion.span key={i} variants={wordVariants} className="inline-block mr-[0.25em]">
+                <motion.span 
+                  key={i} 
+                  variants={wordVariants} 
+                  className={`inline-block mr-[0.25em] ${i >= 3 ? 'italic font-medium text-gold-600 drop-shadow-sm' : ''}`}
+                >
                   {word}
                 </motion.span>
               ))}

@@ -43,6 +43,9 @@ export default function Header() {
   const wishlistCount = useWishlistStore((s) => s.getItemCount());
   const openCart = useCartStore((s) => s.openCart);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -159,7 +162,7 @@ export default function Header() {
                 aria-label="Wishlist"
               >
                 <Heart className="w-5 h-5" />
-                {wishlistCount > 0 && (
+                {mounted && wishlistCount > 0 && (
                   <span className="absolute top-0 right-0 w-4 h-4 bg-gold-400 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                     {wishlistCount}
                   </span>
@@ -180,7 +183,7 @@ export default function Header() {
                 aria-label="Cart"
               >
                 <ShoppingBag className="w-5 h-5" />
-                {cartItemCount > 0 && (
+                {mounted && cartItemCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}

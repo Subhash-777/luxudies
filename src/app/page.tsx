@@ -34,7 +34,6 @@ const FadeInSection = ({ children }: { children: React.ReactNode }) => (
 export default function HomePage() {
   return (
     <>
-      <AnnouncementBar />
       <Header />
 
       <main>
