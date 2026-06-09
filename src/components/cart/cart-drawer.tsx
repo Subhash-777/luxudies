@@ -42,7 +42,9 @@ export default function CartDrawer() {
 
   const subtotal = getSubtotal();
   const amountToFreeShipping = Math.max(0, SHIPPING_CONFIG.freeThreshold - subtotal);
-  const progressPercentage = Math.min(100, (subtotal / SHIPPING_CONFIG.freeThreshold) * 100);
+  const progressPercentage = SHIPPING_CONFIG.freeThreshold > 0 
+    ? Math.min(100, (subtotal / SHIPPING_CONFIG.freeThreshold) * 100)
+    : 100;
 
   const handleCheckout = () => {
     if (items.length === 0) {
@@ -136,7 +138,7 @@ export default function CartDrawer() {
                   <AnimatePresence>
                     {items.map((item) => (
                       <motion.div
-                        key={`${item.product.id}-${item.variantId || 'default'}`}
+                        key={`${item.product.id}-${item.variant_id || 'default'}`}
                         layout
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -160,7 +162,7 @@ export default function CartDrawer() {
                               {item.product.name}
                             </h4>
                             <button
-                              onClick={() => removeItem(item.product.id, item.variantId)}
+                              onClick={() => removeItem(item.product.id, item.variant_id)}
                               className="text-espresso-200 hover:text-red-400 transition-colors"
                               aria-label="Remove item"
                             >
@@ -176,7 +178,7 @@ export default function CartDrawer() {
                           <div className="flex items-center justify-between mt-4">
                             <div className="flex items-center bg-ivory rounded-lg border border-gold-400/20">
                               <button
-                                onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1), item.variantId)}
+                                onClick={() => updateQuantity(item.product.id, item.variant_id, Math.max(1, item.quantity - 1))}
                                 className="w-8 h-8 flex items-center justify-center text-espresso-300 hover:text-espresso"
                               >
                                 <Minus className="w-3 h-3" />
@@ -185,7 +187,7 @@ export default function CartDrawer() {
                                 {item.quantity}
                               </span>
                               <button
-                                onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.variantId)}
+                                onClick={() => updateQuantity(item.product.id, item.variant_id, item.quantity + 1)}
                                 className="w-8 h-8 flex items-center justify-center text-espresso-300 hover:text-espresso"
                               >
                                 <Plus className="w-3 h-3" />

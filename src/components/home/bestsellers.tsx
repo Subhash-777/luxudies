@@ -7,12 +7,12 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import ProductCard from '@/components/product/product-card';
-import { getDummyProducts } from '@/lib/dummy-data';
+import { SAMPLE_PRODUCTS } from '@/lib/sample-data';
 import { motion } from 'framer-motion';
 
 export default function BestsellersSection() {
   // Use dummy data for prototype
-  const bestsellers = getDummyProducts().filter(p => p.is_bestseller).slice(0, 4);
+  const bestsellers = SAMPLE_PRODUCTS.filter(p => p.is_bestseller).slice(0, 4);
 
   return (
     <section className="py-20 lg:py-32 bg-pearl-50 relative overflow-hidden">

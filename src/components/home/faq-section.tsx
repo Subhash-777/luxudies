@@ -7,10 +7,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus } from 'lucide-react';
-import { getDummyFAQs } from '@/lib/dummy-data';
+import { FAQ_DATA } from '@/lib/sample-data';
 
 export default function FAQSection() {
-  const faqs = getDummyFAQs().slice(0, 5);
+  const faqs = FAQ_DATA.slice(0, 5);
   const [openId, setOpenId] = useState<string | null>(faqs[0]?.id || null);
 
   const toggleFaq = (id: string) => {

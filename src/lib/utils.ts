@@ -140,6 +140,7 @@ export const ORDER_STATUS_CONFIG = {
  */
 export const SHIPPING_CONFIG = {
   isFree: true,
+  freeThreshold: 0,
   region: 'Tamil Nadu',
   estimatedDays: { min: 3, max: 7 },
   message: 'Free Shipping Across Tamil Nadu',

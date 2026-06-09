@@ -7,11 +7,11 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import ProductCard from '@/components/product/product-card';
-import { getDummyProducts } from '@/lib/dummy-data';
+import { SAMPLE_PRODUCTS } from '@/lib/sample-data';
 import { motion } from 'framer-motion';
 
 export default function NewArrivalsSection() {
-  const newArrivals = getDummyProducts().filter(p => p.is_new).slice(0, 4);
+  const newArrivals = SAMPLE_PRODUCTS.filter(p => p.is_new).slice(0, 4);
 
   return (
     <section className="py-20 lg:py-32 bg-pearl relative overflow-hidden">

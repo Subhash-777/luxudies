@@ -337,8 +337,8 @@ export default function ProductDetailPage() {
                   <div className="flex gap-1 mb-3">
                     {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-gold-400 text-gold-400" />)}
                   </div>
-                  <p className="font-playfair italic text-lg text-espresso-400 mb-4">"{r.text}"</p>
-                  <p className="font-inter font-bold text-sm text-espresso">{r.name}</p>
+                  <p className="font-playfair italic text-lg text-espresso-400 mb-4">"{r.body}"</p>
+                  <p className="font-inter font-bold text-sm text-espresso">{r.user_name}</p>
                 </div>
               ))}
             </div>

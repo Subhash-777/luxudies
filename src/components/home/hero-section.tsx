@@ -28,7 +28,7 @@ export default function HeroSection() {
   const headlineText = "Luxury jewellery that speaks before you do.";
   const words = headlineText.split(" ");
   
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -36,7 +36,7 @@ export default function HeroSection() {
     },
   };
 
-  const wordVariants = {
+  const wordVariants: any = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 

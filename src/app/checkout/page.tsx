@@ -275,7 +275,7 @@ export default function CheckoutPage() {
                   {items.map((item) => {
                     const img = item.product.images.find((i) => i.is_primary) || item.product.images[0];
                     return (
-                      <div key={`${item.product.id}-${item.variantId}`} className="flex gap-4">
+                      <div key={`${item.product.id}-${item.variant_id}`} className="flex gap-4">
                         <div className="relative w-16 h-20 rounded-xl overflow-hidden bg-pearl-100 flex-shrink-0 border border-gold-400/10">
                           {img && <Image src={img.url} alt={item.product.name} fill className="object-cover" sizes="64px" />}
                           <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-antique text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm">
