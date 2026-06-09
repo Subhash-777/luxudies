@@ -2,6 +2,10 @@
 // LUXUDIES - Homepage
 // ============================================
 
+'use client';
+
+import { motion } from 'framer-motion';
+import AnnouncementBar from '@/components/layout/announcement-bar';
 import Header from '@/components/layout/header';
 import MobileNav from '@/components/layout/mobile-nav';
 import Footer from '@/components/layout/footer';
@@ -16,29 +20,54 @@ import ReviewsSection from '@/components/home/reviews-section';
 import FAQSection from '@/components/home/faq-section';
 import WhatsAppFAB from '@/components/home/whatsapp-fab';
 
+const FadeInSection = ({ children }: { children: React.ReactNode }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 24 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-80px" }}
+    transition={{ duration: 0.6, ease: "easeOut" }}
+  >
+    {children}
+  </motion.div>
+);
+
 export default function HomePage() {
   return (
     <>
+      <AnnouncementBar />
       <Header />
 
       <main>
-        {/* First Fold: Hero */}
+        {/* Hero Section handles its own specific entrance animations */}
         <HeroSection />
 
-        {/* Second Fold: Collections + Products */}
-        <CollectionsSection />
-        <NewArrivalsSection />
-        <BestsellersSection />
+        <FadeInSection>
+          <CollectionsSection />
+        </FadeInSection>
 
-        {/* Third Fold: Trust & Benefits */}
-        <TrustSection />
+        <FadeInSection>
+          <BestsellersSection />
+        </FadeInSection>
 
-        {/* Fourth Fold: Combos & Reviews */}
-        <ComboOffersSection />
-        <ReviewsSection />
+        <FadeInSection>
+          <TrustSection />
+        </FadeInSection>
 
-        {/* Fifth Fold: FAQ */}
-        <FAQSection />
+        <FadeInSection>
+          <NewArrivalsSection />
+        </FadeInSection>
+
+        <FadeInSection>
+          <ComboOffersSection />
+        </FadeInSection>
+
+        <FadeInSection>
+          <ReviewsSection />
+        </FadeInSection>
+
+        <FadeInSection>
+          <FAQSection />
+        </FadeInSection>
       </main>
 
       <Footer />

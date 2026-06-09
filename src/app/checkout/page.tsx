@@ -1,5 +1,5 @@
 // ============================================
-// LUXUDIES - Checkout Page
+// LUXUDIES - Checkout Page (Redesigned)
 // ============================================
 
 'use client';
@@ -8,14 +8,12 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Lock, Truck, Shield, CreditCard, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Lock, Truck, CreditCard, ChevronDown } from 'lucide-react';
 import Header from '@/components/layout/header';
 import MobileNav from '@/components/layout/mobile-nav';
 import CartDrawer from '@/components/cart/cart-drawer';
-import Button from '@/components/ui/button';
-import GlassCard from '@/components/ui/glass-card';
 import { useCartStore } from '@/store/cart-store';
-import { formatPrice, SHIPPING_CONFIG } from '@/lib/utils';
+import { formatPrice } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 interface AddressForm {
@@ -73,14 +71,13 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
-      // Create Razorpay order on server
       const response = await fetch('/api/razorpay/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: getTotal(),
           items: items.map((item) => ({
-            product_id: item.product_id,
+            product_id: item.product.id,
             name: item.product.name,
             price: item.product.price,
             quantity: item.quantity,
@@ -95,17 +92,15 @@ export default function CheckoutPage() {
         throw new Error('Failed to create order');
       }
 
-      // Open Razorpay Checkout
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: getTotal() * 100, // paise
+        amount: getTotal() * 100,
         currency: 'INR',
         name: 'LUXUDIES',
         description: 'Luxury Jewellery Purchase',
         image: '/images/brand/logo.jpg',
         order_id: data.orderId,
-        handler: async function (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) {
-          // Verify payment on server
+        handler: async function (response: any) {
           const verifyRes = await fetch('/api/razorpay/verify-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -157,16 +152,18 @@ export default function CheckoutPage() {
     return (
       <>
         <Header />
-        <main className="min-h-screen flex items-center justify-center py-20">
-          <div className="text-center px-4">
-            <h1 className="font-playfair text-2xl font-bold text-espresso mb-3">
-              Nothing to Checkout
+        <main className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center bg-pearl">
+          <div className="text-center px-4 max-w-sm mx-auto">
+            <h1 className="font-playfair text-3xl font-bold text-espresso mb-4">
+              Your Cart is Empty
             </h1>
-            <p className="font-inter text-sm text-espresso-200 mb-6">
-              Your cart is empty. Add some beautiful pieces first.
+            <p className="font-inter text-sm text-espresso-300 mb-8 leading-relaxed">
+              Looks like you haven't added anything to your cart yet. Discover our beautiful collections.
             </p>
             <Link href="/shop">
-              <Button>SHOP NOW</Button>
+              <button className="btn-gold px-8 py-4 text-xs tracking-widest w-full">
+                SHOP NOW
+              </button>
             </Link>
           </div>
         </main>
@@ -175,184 +172,91 @@ export default function CheckoutPage() {
     );
   }
 
-  const inputClasses = "w-full h-11 px-4 bg-white/60 backdrop-blur-sm border border-gold-400/15 rounded-[10px] text-sm font-inter text-espresso placeholder:text-espresso-100 focus:outline-none focus:border-gold-400/40 focus:ring-2 focus:ring-gold-400/10 transition-all";
-  const labelClasses = "text-xs font-inter font-semibold text-espresso-300 uppercase tracking-wider mb-1.5 block";
+  const inputClasses = "w-full h-12 bg-transparent border-b border-gold-400/30 text-sm font-inter text-espresso placeholder:text-espresso-200 focus:outline-none focus:border-gold-500 transition-colors px-1";
+  const labelClasses = "text-[11px] font-inter font-semibold text-espresso-300 uppercase tracking-widest mb-1 block";
 
   return (
     <>
       <Header />
-      <main className="min-h-screen pb-24 lg:pb-0">
-        <div className="container-luxury py-6 lg:py-10">
-          {/* Back */}
-          <Link href="/cart" className="flex items-center gap-2 text-sm font-inter text-espresso-200 hover:text-gold-500 transition-colors mb-6">
+      <main className="min-h-screen bg-pearl pb-24 lg:pb-12">
+        <div className="container-luxury py-8 lg:py-12">
+          
+          <Link href="/cart" className="inline-flex items-center gap-2 text-xs font-inter font-medium tracking-widest text-espresso-200 hover:text-gold-500 transition-colors uppercase mb-8">
             <ArrowLeft className="w-4 h-4" />
             Back to Cart
           </Link>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="font-playfair text-3xl lg:text-4xl font-bold text-espresso mb-8"
-          >
-            Checkout
-          </motion.h1>
-
-          <div className="grid lg:grid-cols-5 gap-8">
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-16">
+            
             {/* Shipping Form */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="lg:col-span-3"
+              className="lg:col-span-7"
             >
-              <GlassCard variant="strong" padding="lg">
-                <h2 className="font-playfair text-lg font-semibold text-espresso mb-6 flex items-center gap-2">
+              <h1 className="font-playfair text-3xl lg:text-4xl font-bold text-espresso mb-8">
+                Checkout
+              </h1>
+
+              <div className="glass-card p-6 sm:p-10">
+                <h2 className="font-playfair text-xl font-bold text-espresso mb-8 flex items-center gap-3 border-b border-gold-400/20 pb-4">
                   <Truck className="w-5 h-5 text-gold-500" />
                   Shipping Details
                 </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Full Name */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
                   <div className="sm:col-span-2">
                     <label htmlFor="fullName" className={labelClasses}>Full Name *</label>
-                    <input
-                      id="fullName"
-                      name="fullName"
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={address.fullName}
-                      onChange={handleChange}
-                      className={inputClasses}
-                      required
-                    />
+                    <input id="fullName" name="fullName" type="text" value={address.fullName} onChange={handleChange} className={inputClasses} required />
                   </div>
 
-                  {/* Phone */}
-                  <div>
-                    <label htmlFor="phone" className={labelClasses}>Contact Number *</label>
-                    <input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      placeholder="+91 98765 43210"
-                      value={address.phone}
-                      onChange={handleChange}
-                      className={inputClasses}
-                      maxLength={15}
-                      required
-                    />
-                  </div>
-
-                  {/* Alternate Phone */}
-                  <div>
-                    <label htmlFor="alternatePhone" className={labelClasses}>Alternate Contact</label>
-                    <input
-                      id="alternatePhone"
-                      name="alternatePhone"
-                      type="tel"
-                      placeholder="Optional"
-                      value={address.alternatePhone}
-                      onChange={handleChange}
-                      className={inputClasses}
-                      maxLength={15}
-                    />
-                  </div>
-
-                  {/* Email */}
                   <div className="sm:col-span-2">
                     <label htmlFor="email" className={labelClasses}>Email Address *</label>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={address.email}
-                      onChange={handleChange}
-                      className={inputClasses}
-                      required
-                    />
+                    <input id="email" name="email" type="email" value={address.email} onChange={handleChange} className={inputClasses} required />
                   </div>
 
-                  {/* Address Line 1 */}
+                  <div>
+                    <label htmlFor="phone" className={labelClasses}>Contact Number *</label>
+                    <input id="phone" name="phone" type="tel" value={address.phone} onChange={handleChange} className={inputClasses} maxLength={10} required />
+                  </div>
+
+                  <div>
+                    <label htmlFor="alternatePhone" className={labelClasses}>Alternate Contact</label>
+                    <input id="alternatePhone" name="alternatePhone" type="tel" value={address.alternatePhone} onChange={handleChange} className={inputClasses} maxLength={10} />
+                  </div>
+
                   <div className="sm:col-span-2">
                     <label htmlFor="line1" className={labelClasses}>Address Line 1 *</label>
-                    <input
-                      id="line1"
-                      name="line1"
-                      type="text"
-                      placeholder="House/Flat number, Building, Street"
-                      value={address.line1}
-                      onChange={handleChange}
-                      className={inputClasses}
-                      required
-                    />
+                    <input id="line1" name="line1" type="text" placeholder="House/Flat number, Building, Street" value={address.line1} onChange={handleChange} className={inputClasses} required />
                   </div>
 
-                  {/* Address Line 2 */}
                   <div className="sm:col-span-2">
                     <label htmlFor="line2" className={labelClasses}>Address Line 2</label>
-                    <input
-                      id="line2"
-                      name="line2"
-                      type="text"
-                      placeholder="Landmark, Area (Optional)"
-                      value={address.line2}
-                      onChange={handleChange}
-                      className={inputClasses}
-                    />
+                    <input id="line2" name="line2" type="text" placeholder="Landmark, Area (Optional)" value={address.line2} onChange={handleChange} className={inputClasses} />
                   </div>
 
-                  {/* City */}
                   <div>
                     <label htmlFor="city" className={labelClasses}>City *</label>
                     <div className="relative">
-                      <select
-                        id="city"
-                        name="city"
-                        value={address.city}
-                        onChange={handleChange}
-                        className={`${inputClasses} appearance-none pr-10`}
-                        required
-                      >
+                      <select id="city" name="city" value={address.city} onChange={handleChange} className={`${inputClasses} appearance-none pr-10`} required>
                         <option value="">Select city</option>
-                        {TAMIL_NADU_CITIES.map((city) => (
-                          <option key={city} value={city}>{city}</option>
-                        ))}
+                        {TAMIL_NADU_CITIES.map((city) => <option key={city} value={city}>{city}</option>)}
                       </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso-200 pointer-events-none" />
+                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso-200 pointer-events-none" />
                     </div>
                   </div>
 
-                  {/* State */}
-                  <div>
-                    <label htmlFor="state" className={labelClasses}>State</label>
-                    <input
-                      id="state"
-                      name="state"
-                      type="text"
-                      value={address.state}
-                      className={`${inputClasses} bg-pearl-200/50`}
-                      readOnly
-                    />
-                  </div>
-
-                  {/* Pincode */}
                   <div>
                     <label htmlFor="pincode" className={labelClasses}>Pincode *</label>
-                    <input
-                      id="pincode"
-                      name="pincode"
-                      type="text"
-                      placeholder="600001"
-                      value={address.pincode}
-                      onChange={handleChange}
-                      className={inputClasses}
-                      maxLength={6}
-                      required
-                    />
+                    <input id="pincode" name="pincode" type="text" value={address.pincode} onChange={handleChange} className={inputClasses} maxLength={6} required />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label htmlFor="state" className={labelClasses}>State</label>
+                    <input id="state" name="state" type="text" value={address.state} className={`${inputClasses} bg-pearl-200/50 cursor-not-allowed`} readOnly />
                   </div>
                 </div>
-              </GlassCard>
+              </div>
             </motion.div>
 
             {/* Order Summary */}
@@ -360,85 +264,68 @@ export default function CheckoutPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="lg:col-span-2"
+              className="lg:col-span-5"
             >
-              <GlassCard variant="strong" padding="lg" className="sticky top-24">
-                <h2 className="font-playfair text-lg font-semibold text-espresso mb-6">
+              <div className="glass-card p-6 sm:p-8 lg:sticky lg:top-24">
+                <h2 className="font-playfair text-xl font-bold text-espresso mb-6 border-b border-gold-400/20 pb-4">
                   Order Summary
                 </h2>
 
-                {/* Items */}
-                <div className="space-y-3 mb-6 max-h-[300px] overflow-y-auto scrollbar-hide">
+                <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto scrollbar-hide pr-2">
                   {items.map((item) => {
                     const img = item.product.images.find((i) => i.is_primary) || item.product.images[0];
                     return (
-                      <div key={`${item.product_id}-${item.variant_id}`} className="flex gap-3">
-                        <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-pearl-100 shrink-0">
-                          {img && (
-                            <Image src={img.url} alt={item.product.name} fill className="object-cover" sizes="56px" />
-                          )}
-                          <span className="absolute -top-1 -right-1 w-5 h-5 bg-espresso text-pearl text-[10px] font-bold rounded-full flex items-center justify-center">
+                      <div key={`${item.product.id}-${item.variantId}`} className="flex gap-4">
+                        <div className="relative w-16 h-20 rounded-xl overflow-hidden bg-pearl-100 flex-shrink-0 border border-gold-400/10">
+                          {img && <Image src={img.url} alt={item.product.name} fill className="object-cover" sizes="64px" />}
+                          <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-antique text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm">
                             {item.quantity}
                           </span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-inter text-xs font-medium text-espresso line-clamp-1">{item.product.name}</p>
-                          <p className="font-inter text-xs text-espresso-200">Qty: {item.quantity}</p>
+                        <div className="flex-1 min-w-0 py-1">
+                          <p className="font-playfair text-sm font-semibold text-espresso line-clamp-2 leading-snug mb-1">{item.product.name}</p>
+                          <span className="font-inter text-sm font-bold text-espresso">
+                            {formatPrice(item.product.price * item.quantity)}
+                          </span>
                         </div>
-                        <span className="font-inter text-sm font-semibold text-espresso shrink-0">
-                          {formatPrice(item.product.price * item.quantity)}
-                        </span>
                       </div>
                     );
                   })}
                 </div>
 
-                {/* Totals */}
-                <div className="space-y-2 border-t border-gold-400/10 pt-4 mb-6">
+                <div className="space-y-3 pt-6 border-t border-gold-400/20 mb-8">
                   <div className="flex justify-between text-sm font-inter">
-                    <span className="text-espresso-200">Subtotal</span>
+                    <span className="text-espresso-300">Subtotal</span>
                     <span className="font-medium text-espresso">{formatPrice(getSubtotal())}</span>
                   </div>
                   <div className="flex justify-between text-sm font-inter">
-                    <span className="text-espresso-200">Shipping</span>
-                    <span className="font-medium text-green-600">FREE</span>
+                    <span className="text-espresso-300">Shipping</span>
+                    <span className="font-medium text-antique">FREE</span>
                   </div>
-                  <div className="flex justify-between pt-3 border-t border-gold-400/10">
-                    <span className="font-inter font-semibold text-espresso">Total</span>
-                    <span className="font-inter font-bold text-xl text-espresso">{formatPrice(getTotal())}</span>
+                  <div className="flex justify-between pt-4 mt-2 border-t border-gold-400/20">
+                    <span className="font-inter font-bold text-espresso uppercase tracking-widest">Total</span>
+                    <span className="font-inter font-bold text-2xl text-espresso">{formatPrice(getTotal())}</span>
                   </div>
                 </div>
 
-                {/* Pay Button */}
-                <Button
-                  fullWidth
-                  size="lg"
+                <button
                   onClick={handlePayment}
-                  isLoading={isProcessing}
-                  icon={<CreditCard className="w-4 h-4" />}
+                  disabled={isProcessing}
+                  className="w-full btn-gold h-14 text-sm tracking-widest flex items-center justify-center gap-3 shadow-gold"
                 >
                   {isProcessing ? 'PROCESSING...' : `PAY ${formatPrice(getTotal())}`}
-                </Button>
+                  {!isProcessing && <CreditCard className="w-5 h-5" />}
+                </button>
 
-                {/* Trust Badges */}
-                <div className="flex flex-col items-center gap-2 mt-4">
+                <div className="flex flex-col items-center gap-3 mt-6">
                   <div className="flex items-center gap-2">
-                    <Lock className="w-3.5 h-3.5 text-gold-400" />
-                    <span className="text-[10px] font-inter text-espresso-200">
+                    <Lock className="w-3.5 h-3.5 text-gold-500" />
+                    <span className="text-xs font-inter font-medium text-espresso-300">
                       Secured by Razorpay
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 text-[10px] text-espresso-100 font-inter">
-                    <span>UPI</span>
-                    <span>•</span>
-                    <span>Cards</span>
-                    <span>•</span>
-                    <span>Net Banking</span>
-                    <span>•</span>
-                    <span>Wallets</span>
-                  </div>
                 </div>
-              </GlassCard>
+              </div>
             </motion.div>
           </div>
         </div>

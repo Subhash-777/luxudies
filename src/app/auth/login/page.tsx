@@ -1,5 +1,5 @@
 // ============================================
-// LUXUDIES - Login Page
+// LUXUDIES - Login Page (Redesigned)
 // ============================================
 
 'use client';
@@ -10,10 +10,6 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, Smartphone, ArrowRight } from 'lucide-react';
-import Header from '@/components/layout/header';
-import MobileNav from '@/components/layout/mobile-nav';
-import Button from '@/components/ui/button';
-import GlassCard from '@/components/ui/glass-card';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 
@@ -119,159 +115,207 @@ function LoginContent() {
     }
   };
 
-  const inputClasses = "w-full h-12 px-4 bg-white/60 backdrop-blur-sm border border-gold-400/15 rounded-[12px] text-sm font-inter text-espresso placeholder:text-espresso-100 focus:outline-none focus:border-gold-400/40 focus:ring-2 focus:ring-gold-400/10 transition-all";
+  const inputClasses = "w-full h-12 bg-transparent border-b border-gold-400/30 text-sm font-inter text-espresso placeholder:text-espresso-200 focus:outline-none focus:border-gold-500 transition-colors px-1";
 
   return (
-    <main className="min-h-screen flex items-center justify-center py-12 px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
-      >
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <Image src="/images/brand/logo.jpg" alt="LUXUDIES" width={48} height={48} className="rounded-full border border-gold-400/20" />
+    <div className="min-h-screen flex bg-pearl">
+      
+      {/* Left Half: Editorial Image */}
+      <div className="hidden lg:flex w-1/2 relative bg-espresso">
+        <Image
+          src="/images/products/bracelet.jpg" // A nice lifestyle image
+          alt="LUXUDIES Lifestyle"
+          fill
+          className="object-cover opacity-80"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-espresso-500/90 via-espresso-500/20 to-transparent" />
+        <div className="absolute bottom-16 left-16 right-16">
+          <Link href="/" className="inline-block mb-6">
+            <span className="font-playfair text-3xl font-bold tracking-wide text-white">
+              LUXUDIES
+            </span>
           </Link>
-          <h1 className="font-playfair text-2xl font-bold text-espresso">Welcome Back</h1>
-          <p className="font-inter text-sm text-espresso-200 mt-1">Sign in to your LUXUDIES account</p>
-        </div>
-
-        <GlassCard variant="strong" padding="lg">
-          {/* Google Login */}
-          <button
-            onClick={handleGoogleLogin}
-            className="w-full h-12 flex items-center justify-center gap-3 bg-white border border-pearl-400 rounded-[12px] text-sm font-inter font-medium text-espresso hover:bg-pearl-100 transition-colors mb-6"
-          >
-            <GoogleIcon className="w-5 h-5" />
-            Continue with Google
-          </button>
-
-          {/* Divider */}
-          <div className="flex items-center gap-4 mb-6">
-            <span className="flex-1 h-px bg-gold-400/10" />
-            <span className="text-xs font-inter text-espresso-100">or</span>
-            <span className="flex-1 h-px bg-gold-400/10" />
-          </div>
-
-          {/* Mode Toggle */}
-          <div className="flex bg-pearl-200 rounded-full p-1 mb-6">
-            <button
-              onClick={() => { setMode('email'); setOtpSent(false); }}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-inter font-medium transition-all ${mode === 'email' ? 'bg-white text-espresso shadow-sm' : 'text-espresso-200'}`}
-            >
-              <Mail className="w-3.5 h-3.5" />
-              Email
-            </button>
-            <button
-              onClick={() => setMode('otp')}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-inter font-medium transition-all ${mode === 'otp' ? 'bg-white text-espresso shadow-sm' : 'text-espresso-200'}`}
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              OTP
-            </button>
-          </div>
-
-          {mode === 'email' ? (
-            <form onSubmit={handleEmailLogin} className="space-y-4">
-              <div>
-                <input
-                  type="email"
-                  placeholder="Email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={inputClasses}
-                  required
-                />
-              </div>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={`${inputClasses} pr-12`}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-espresso-200 hover:text-espresso"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-              <Button type="submit" fullWidth size="lg" isLoading={isLoading}>
-                SIGN IN
-              </Button>
-            </form>
-          ) : (
-            <div className="space-y-4">
-              {!otpSent ? (
-                <>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-inter text-espresso-200">+91</span>
-                    <input
-                      type="tel"
-                      placeholder="Phone number"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                      className={`${inputClasses} pl-14`}
-                      maxLength={10}
-                    />
-                  </div>
-                  <Button fullWidth size="lg" onClick={handleSendOTP} isLoading={isLoading}>
-                    SEND OTP
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <p className="text-xs font-inter text-espresso-200 text-center">
-                    OTP sent to +91 {phone}
-                  </p>
-                  <input
-                    type="text"
-                    placeholder="Enter 6-digit OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    className={`${inputClasses} text-center text-lg tracking-[0.5em]`}
-                    maxLength={6}
-                  />
-                  <Button fullWidth size="lg" onClick={handleVerifyOTP} isLoading={isLoading}>
-                    VERIFY OTP
-                  </Button>
-                  <button
-                    onClick={() => setOtpSent(false)}
-                    className="w-full text-center text-xs font-inter text-espresso-200 hover:text-gold-500 transition-colors"
-                  >
-                    Change phone number
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Sign Up Link */}
-          <p className="text-center text-sm font-inter text-espresso-200 mt-6">
-            Don&apos;t have an account?{' '}
-            <Link href="/auth/signup" className="text-gold-500 font-semibold hover:text-gold-600 transition-colors">
-              Create Account
-            </Link>
+          <h2 className="font-playfair text-4xl text-white font-medium mb-4 leading-tight">
+            Curated elegance for the modern soul.
+          </h2>
+          <p className="font-inter text-pearl-200 opacity-80 max-w-sm">
+            Sign in to access your wishlist, track orders, and experience personalized luxury.
           </p>
-        </GlassCard>
-      </motion.div>
-    </main>
+        </div>
+      </div>
+
+      {/* Right Half: Form Container */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
+        >
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-10">
+            <Link href="/" className="inline-flex items-center gap-2 mb-4">
+              <Image src="/images/brand/logo.jpg" alt="LUXUDIES" width={48} height={48} className="rounded-full border border-gold-400/20" />
+            </Link>
+            <h1 className="font-playfair text-2xl font-bold text-espresso">Welcome Back</h1>
+          </div>
+
+          <div className="hidden lg:block mb-10">
+            <h1 className="font-playfair text-4xl font-bold text-espresso mb-2">Sign In</h1>
+            <p className="font-inter text-espresso-200">Welcome back to LUXUDIES</p>
+          </div>
+
+          <div className="space-y-8">
+            {/* Google Login */}
+            <button
+              onClick={handleGoogleLogin}
+              className="w-full h-12 flex items-center justify-center gap-3 bg-white border border-gold-400/20 rounded-full text-sm font-inter font-medium text-espresso hover:bg-gold-50 hover:border-gold-400/40 transition-colors shadow-sm"
+            >
+              <GoogleIcon className="w-5 h-5" />
+              Continue with Google
+            </button>
+
+            {/* Divider */}
+            <div className="flex items-center gap-4">
+              <span className="flex-1 h-px bg-gold-400/20" />
+              <span className="text-[10px] font-inter uppercase tracking-widest text-espresso-200">Or sign in with</span>
+              <span className="flex-1 h-px bg-gold-400/20" />
+            </div>
+
+            {/* Mode Toggle */}
+            <div className="flex bg-ivory rounded-full p-1 border border-gold-400/10">
+              <button
+                onClick={() => { setMode('email'); setOtpSent(false); }}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-xs font-inter font-medium transition-all ${mode === 'email' ? 'bg-white text-espresso shadow-soft border border-gold-400/10' : 'text-espresso-200 hover:text-espresso'}`}
+              >
+                <Mail className="w-4 h-4" />
+                Email
+              </button>
+              <button
+                onClick={() => setMode('otp')}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-xs font-inter font-medium transition-all ${mode === 'otp' ? 'bg-white text-espresso shadow-soft border border-gold-400/10' : 'text-espresso-200 hover:text-espresso'}`}
+              >
+                <Smartphone className="w-4 h-4" />
+                OTP
+              </button>
+            </div>
+
+            {mode === 'email' ? (
+              <form onSubmit={handleEmailLogin} className="space-y-6">
+                <div>
+                  <input
+                    type="email"
+                    placeholder="Email Address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={inputClasses}
+                    required
+                  />
+                </div>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={inputClasses}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-espresso-200 hover:text-espresso"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                
+                <div className="flex justify-end">
+                  <Link href="/auth/reset-password" className="text-xs font-inter text-espresso-200 hover:text-gold-500">
+                    Forgot password?
+                  </Link>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full btn-gold h-12 text-xs tracking-widest shadow-gold mt-2"
+                >
+                  {isLoading ? 'SIGNING IN...' : 'SIGN IN'}
+                </button>
+              </form>
+            ) : (
+              <div className="space-y-6">
+                {!otpSent ? (
+                  <>
+                    <div className="relative">
+                      <span className="absolute left-1 top-1/2 -translate-y-1/2 text-sm font-inter text-espresso-300">+91</span>
+                      <input
+                        type="tel"
+                        placeholder="Phone Number"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                        className={`${inputClasses} pl-10`}
+                        maxLength={10}
+                      />
+                    </div>
+                    <button
+                      onClick={handleSendOTP}
+                      disabled={isLoading}
+                      className="w-full btn-gold h-12 text-xs tracking-widest shadow-gold mt-2"
+                    >
+                      {isLoading ? 'SENDING...' : 'SEND OTP'}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xs font-inter text-espresso-300">
+                      OTP sent to +91 {phone}
+                    </p>
+                    <input
+                      type="text"
+                      placeholder="Enter 6-digit OTP"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      className={`${inputClasses} text-center text-xl tracking-[0.5em]`}
+                      maxLength={6}
+                    />
+                    <button
+                      onClick={handleVerifyOTP}
+                      disabled={isLoading}
+                      className="w-full btn-gold h-12 text-xs tracking-widest shadow-gold mt-2"
+                    >
+                      {isLoading ? 'VERIFYING...' : 'VERIFY OTP'}
+                    </button>
+                    <button
+                      onClick={() => setOtpSent(false)}
+                      className="w-full text-center text-xs font-inter text-espresso-200 hover:text-gold-500"
+                    >
+                      Change phone number
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+
+            <p className="text-center text-sm font-inter text-espresso-200 pt-6">
+              Don't have an account?{' '}
+              <Link href={`/auth/signup?redirect=${redirect}`} className="text-espresso font-semibold hover:text-gold-500 underline underline-offset-4 decoration-gold-400/30 hover:decoration-gold-500 transition-all">
+                Create one
+              </Link>
+            </p>
+          </div>
+
+        </motion.div>
+      </div>
+    </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <>
-      <Header />
-      <Suspense fallback={<div className="min-h-screen" />}>
-        <LoginContent />
-      </Suspense>
-      <MobileNav />
-    </>
+    <Suspense fallback={<div className="min-h-screen bg-pearl flex items-center justify-center">Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

@@ -1,178 +1,152 @@
 // ============================================
-// LUXUDIES - Reviews Section
+// LUXUDIES - Reviews Section (Redesigned)
 // ============================================
 
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
-import GlassCard from '@/components/ui/glass-card';
-import { SAMPLE_REVIEWS } from '@/lib/sample-data';
+import { useRef, useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Star } from 'lucide-react';
 
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          className={`w-4 h-4 ${
-            i < rating
-              ? 'text-gold-400 fill-gold-400'
-              : 'text-pearl-400'
-          }`}
-        />
-      ))}
-    </div>
-  );
-}
+const reviews = [
+  {
+    id: 1,
+    name: "Priya S.",
+    location: "Chennai, TN",
+    rating: 5,
+    text: "The signature bow pendant is absolutely stunning. It has that perfect 18K gold shine and doesn't irritate my sensitive skin at all. Highly recommend!",
+    product: "Signature Bow Pendant"
+  },
+  {
+    id: 2,
+    name: "Ananya R.",
+    location: "Bangalore, KA",
+    rating: 5,
+    text: "I bought the everyday essentials combo. The packaging was so premium, it felt like opening a luxury gift. The minimalist ring is my new favorite.",
+    product: "Everyday Essentials Combo"
+  },
+  {
+    id: 3,
+    name: "Karthik M.",
+    location: "Coimbatore, TN",
+    rating: 5,
+    text: "Gifted the pearl drop earrings to my wife for our anniversary. She loves how lightweight they are. The quality is exceptional for the price.",
+    product: "Pearl Drop Earrings"
+  },
+  {
+    id: 4,
+    name: "Sneha V.",
+    location: "Hyderabad, TS",
+    rating: 5,
+    text: "Been wearing the chain bracelet daily, even in the shower. True to their word, absolutely zero tarnishing. Beautiful craftsmanship.",
+    product: "Classic Chain Bracelet"
+  }
+];
 
 export default function ReviewsSection() {
-  const [current, setCurrent] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
-  const next = () => setCurrent((prev) => (prev + 1) % SAMPLE_REVIEWS.length);
-  const prev = () =>
-    setCurrent((prev) =>
-      prev === 0 ? SAMPLE_REVIEWS.length - 1 : prev - 1
-    );
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    const progress = scrollLeft / (scrollWidth - clientWidth);
+    setScrollProgress(progress);
+  };
 
-  const avgRating = (
-    SAMPLE_REVIEWS.reduce((sum, r) => sum + r.rating, 0) / SAMPLE_REVIEWS.length
-  ).toFixed(1);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) {
+      el.addEventListener('scroll', handleScroll);
+      handleScroll(); // Init
+      return () => el.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
 
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-20 lg:py-32 bg-ivory-50 relative overflow-hidden">
       <div className="container-luxury">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-10 lg:mb-14"
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12 lg:mb-16"
         >
-          <span className="text-xs font-inter font-semibold tracking-[0.15em] text-gold-500 uppercase mb-3 block">
-            Customer Love
-          </span>
-          <h2 className="font-playfair text-2xl sm:text-3xl lg:text-4xl font-bold text-espresso mb-3">
-            What Our Customers Say
-          </h2>
-          <div className="flex items-center justify-center gap-3">
-            <StarRating rating={5} />
-            <span className="font-inter text-sm text-espresso-200">
-              {avgRating} / 5 · {SAMPLE_REVIEWS.length} Reviews
-            </span>
+          {/* Overall Rating Badge */}
+          <div className="inline-flex flex-col items-center justify-center mb-6">
+            <div className="flex items-center gap-1 mb-2">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-6 h-6 fill-gold-400 text-gold-400" />
+              ))}
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="font-playfair text-4xl font-bold text-espresso">4.9</span>
+              <span className="font-inter text-sm text-espresso-300">based on 1,200+ reviews</span>
+            </div>
           </div>
+          
+          <h2 className="font-playfair text-3xl lg:text-4xl xl:text-5xl font-bold text-espresso mb-3">
+            Words of Love
+          </h2>
+          <p className="font-inter text-espresso-200">
+            Real experiences from our beautiful community.
+          </p>
         </motion.div>
 
-        {/* Desktop Grid */}
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {SAMPLE_REVIEWS.slice(0, 3).map((review, i) => (
+        {/* Scrollable Reviews Container */}
+        <div 
+          ref={scrollRef}
+          className="flex lg:grid lg:grid-cols-4 gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible pb-8 lg:pb-0 snap-x snap-mandatory scrollbar-hide -mx-4 px-4 lg:mx-0 lg:px-0"
+        >
+          {reviews.map((review, index) => (
             <motion.div
               key={review.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
+              className="min-w-[300px] sm:min-w-[340px] lg:min-w-0 snap-start flex-shrink-0"
             >
-              <GlassCard padding="lg" hover className="h-full">
-                <Quote className="w-8 h-8 text-gold-200 mb-4" />
-                <StarRating rating={review.rating} />
-                <h4 className="font-inter font-semibold text-espresso mt-3 mb-2">
-                  {review.title}
-                </h4>
-                <p className="font-inter text-sm text-espresso-200 leading-relaxed mb-4">
-                  &ldquo;{review.body}&rdquo;
-                </p>
-                <div className="flex items-center gap-3 pt-4 border-t border-gold-400/10">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gold-200 to-gold-400 flex items-center justify-center text-white font-inter font-bold text-sm">
-                    {review.user_name[0]}
-                  </div>
-                  <div>
-                    <p className="font-inter font-medium text-sm text-espresso">
-                      {review.user_name}
-                    </p>
-                    {review.is_verified && (
-                      <p className="text-[10px] font-inter text-green-600">
-                        ✓ Verified Purchase
-                      </p>
-                    )}
-                  </div>
+              <div className="glass-card p-6 lg:p-8 h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-medium hover:border-gold-400/30">
+                <div className="flex gap-1 mb-4">
+                  {[...Array(review.rating)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-gold-400 text-gold-400" />
+                  ))}
                 </div>
-              </GlassCard>
+                
+                <p className="font-playfair italic text-lg lg:text-xl text-espresso-400 leading-relaxed flex-1 mb-6">
+                  "{review.text}"
+                </p>
+
+                <div className="mt-auto border-t border-gold-400/10 pt-4">
+                  <p className="font-inter font-bold text-sm text-espresso mb-0.5">
+                    {review.name}
+                  </p>
+                  <p className="font-inter text-xs text-espresso-300 mb-2">
+                    {review.location}
+                  </p>
+                  <p className="font-inter text-[10px] text-gold-500 uppercase tracking-wider">
+                    Purchased: {review.product}
+                  </p>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Mobile Carousel */}
-        <div className="md:hidden relative">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={current}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
-            >
-              <GlassCard padding="lg">
-                <Quote className="w-7 h-7 text-gold-200 mb-3" />
-                <StarRating rating={SAMPLE_REVIEWS[current].rating} />
-                <h4 className="font-inter font-semibold text-espresso mt-3 mb-2">
-                  {SAMPLE_REVIEWS[current].title}
-                </h4>
-                <p className="font-inter text-sm text-espresso-200 leading-relaxed mb-4">
-                  &ldquo;{SAMPLE_REVIEWS[current].body}&rdquo;
-                </p>
-                <div className="flex items-center gap-3 pt-4 border-t border-gold-400/10">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gold-200 to-gold-400 flex items-center justify-center text-white font-inter font-bold text-sm">
-                    {SAMPLE_REVIEWS[current].user_name[0]}
-                  </div>
-                  <div>
-                    <p className="font-inter font-medium text-sm text-espresso">
-                      {SAMPLE_REVIEWS[current].user_name}
-                    </p>
-                    {SAMPLE_REVIEWS[current].is_verified && (
-                      <p className="text-[10px] font-inter text-green-600">
-                        ✓ Verified Purchase
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </GlassCard>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Carousel controls */}
-          <div className="flex items-center justify-center gap-4 mt-6">
-            <button
-              onClick={prev}
-              className="w-10 h-10 rounded-full border border-gold-400/20 flex items-center justify-center text-espresso-300 hover:bg-gold-50 transition-colors"
-              aria-label="Previous review"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-            <div className="flex items-center gap-1.5">
-              {SAMPLE_REVIEWS.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrent(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    i === current
-                      ? 'bg-gold-400 w-5'
-                      : 'bg-pearl-400'
-                  }`}
-                  aria-label={`Go to review ${i + 1}`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={next}
-              className="w-10 h-10 rounded-full border border-gold-400/20 flex items-center justify-center text-espresso-300 hover:bg-gold-50 transition-colors"
-              aria-label="Next review"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
+        {/* Mobile Scroll Indicator */}
+        <div className="flex lg:hidden justify-center gap-2 mt-4">
+          {reviews.map((_, i) => (
+            <div 
+              key={i} 
+              className={`h-1 rounded-full transition-all duration-300 ${
+                Math.abs(scrollProgress * (reviews.length - 1) - i) < 0.5 
+                  ? 'w-6 bg-gold-400' 
+                  : 'w-1.5 bg-gold-400/20'
+              }`} 
+            />
+          ))}
         </div>
       </div>
     </section>

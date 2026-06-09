@@ -1,112 +1,81 @@
 // ============================================
-// LUXUDIES - FAQ Section
+// LUXUDIES - FAQ Section (Redesigned)
 // ============================================
 
 'use client';
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, HelpCircle } from 'lucide-react';
-import { FAQ_DATA } from '@/lib/sample-data';
-import { cn } from '@/lib/utils';
-
-function FAQItem({
-  question,
-  answer,
-  isOpen,
-  onToggle,
-  index,
-}: {
-  question: string;
-  answer: string;
-  isOpen: boolean;
-  onToggle: () => void;
-  index: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.05 }}
-      className="border-b border-gold-400/10 last:border-b-0"
-    >
-      <button
-        onClick={onToggle}
-        className="flex items-center justify-between w-full py-5 text-left group"
-        aria-expanded={isOpen}
-      >
-        <span
-          className={cn(
-            'font-inter font-medium text-sm sm:text-base pr-4 transition-colors',
-            isOpen ? 'text-gold-500' : 'text-espresso group-hover:text-gold-500'
-          )}
-        >
-          {question}
-        </span>
-        <motion.span
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.3 }}
-          className="shrink-0 text-gold-400"
-        >
-          <ChevronDown className="w-5 h-5" />
-        </motion.span>
-      </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
-          >
-            <p className="font-inter text-sm text-espresso-200 leading-relaxed pb-5 pr-8">
-              {answer}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-}
+import { Plus, Minus } from 'lucide-react';
+import { getDummyFAQs } from '@/lib/dummy-data';
 
 export default function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const faqs = getDummyFAQs().slice(0, 5);
+  const [openId, setOpenId] = useState<string | null>(faqs[0]?.id || null);
+
+  const toggleFaq = (id: string) => {
+    setOpenId(openId === id ? null : id);
+  };
 
   return (
-    <section className="py-16 lg:py-24 bg-luxury-section">
-      <div className="container-luxury max-w-3xl">
+    <section className="py-20 lg:py-32 bg-pearl relative overflow-hidden">
+      <div className="container-luxury max-w-3xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-10 lg:mb-14"
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12 lg:mb-16"
         >
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <HelpCircle className="w-5 h-5 text-gold-400" />
-            <span className="text-xs font-inter font-semibold tracking-[0.15em] text-gold-500 uppercase">
-              Got Questions?
-            </span>
-          </div>
-          <h2 className="font-playfair text-2xl sm:text-3xl lg:text-4xl font-bold text-espresso mb-3">
-            Frequently Asked Questions
+          <h2 className="font-playfair text-3xl lg:text-4xl xl:text-5xl font-bold text-espresso mb-3">
+            Common Questions
           </h2>
-          <p className="font-inter text-sm text-espresso-200">
-            Everything you need to know before you shop.
+          <p className="font-inter text-espresso-200">
+            Everything you need to know about our jewelry.
           </p>
         </motion.div>
 
-        <div className="glass-card-strong p-4 sm:p-6 lg:p-8">
-          {FAQ_DATA.map((faq, i) => (
-            <FAQItem
-              key={i}
-              question={faq.question}
-              answer={faq.answer}
-              isOpen={openIndex === i}
-              onToggle={() => setOpenIndex(openIndex === i ? null : i)}
-              index={i}
-            />
+        <div className="space-y-4">
+          {faqs.map((faq, index) => (
+            <motion.div
+              key={faq.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="glass-card overflow-hidden"
+            >
+              <button
+                onClick={() => toggleFaq(faq.id)}
+                className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
+              >
+                <span className="font-playfair font-medium text-lg text-espresso pr-4">
+                  {faq.question}
+                </span>
+                <span className="flex-shrink-0 w-8 h-8 rounded-full border border-gold-400/30 flex items-center justify-center bg-gold-50/50 transition-colors hover:bg-gold-100">
+                  {openId === faq.id ? (
+                    <Minus className="w-4 h-4 text-gold-500" />
+                  ) : (
+                    <Plus className="w-4 h-4 text-gold-500" />
+                  )}
+                </span>
+              </button>
+
+              <AnimatePresence initial={false}>
+                {openId === faq.id && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  >
+                    <div className="px-6 pb-6 pt-0 font-inter text-espresso-300 leading-relaxed text-sm">
+                      {faq.answer}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           ))}
         </div>
       </div>

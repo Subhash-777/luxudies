@@ -1,5 +1,5 @@
 // ============================================
-// LUXUDIES - Sign Up Page
+// LUXUDIES - Sign Up Page (Redesigned)
 // ============================================
 
 'use client';
@@ -10,10 +10,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, User, Mail, Phone } from 'lucide-react';
-import Header from '@/components/layout/header';
-import MobileNav from '@/components/layout/mobile-nav';
-import Button from '@/components/ui/button';
-import GlassCard from '@/components/ui/glass-card';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 
@@ -82,76 +78,104 @@ export default function SignUpPage() {
     }
   };
 
-  const inputClasses = "w-full h-12 px-4 bg-white/60 backdrop-blur-sm border border-gold-400/15 rounded-[12px] text-sm font-inter text-espresso placeholder:text-espresso-100 focus:outline-none focus:border-gold-400/40 focus:ring-2 focus:ring-gold-400/10 transition-all";
+  const inputClasses = "w-full h-12 bg-transparent border-b border-gold-400/30 text-sm font-inter text-espresso placeholder:text-espresso-200 focus:outline-none focus:border-gold-500 transition-colors px-1";
 
   return (
-    <>
-      <Header />
-      <main className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen flex bg-pearl">
+      
+      {/* Left Half: Editorial Image */}
+      <div className="hidden lg:flex w-1/2 relative bg-espresso">
+        <Image
+          src="/images/products/ring.jpg" // A nice lifestyle image
+          alt="LUXUDIES Lifestyle"
+          fill
+          className="object-cover opacity-80"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-espresso-500/90 via-espresso-500/20 to-transparent" />
+        <div className="absolute bottom-16 left-16 right-16">
+          <Link href="/" className="inline-block mb-6">
+            <span className="font-playfair text-3xl font-bold tracking-wide text-white">
+              LUXUDIES
+            </span>
+          </Link>
+          <h2 className="font-playfair text-4xl text-white font-medium mb-4 leading-tight">
+            Begin your journey of elegance.
+          </h2>
+          <p className="font-inter text-pearl-200 opacity-80 max-w-sm">
+            Create an account to unlock exclusive offers, save your favorite pieces, and manage your orders effortlessly.
+          </p>
+        </div>
+      </div>
+
+      {/* Right Half: Form Container */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 overflow-y-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
+          className="w-full max-w-md my-auto"
         >
-          {/* Logo */}
-          <div className="text-center mb-8">
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-10">
             <Link href="/" className="inline-flex items-center gap-2 mb-4">
               <Image src="/images/brand/logo.jpg" alt="LUXUDIES" width={48} height={48} className="rounded-full border border-gold-400/20" />
             </Link>
             <h1 className="font-playfair text-2xl font-bold text-espresso">Create Account</h1>
-            <p className="font-inter text-sm text-espresso-200 mt-1">Join the LUXUDIES family</p>
           </div>
 
-          <GlassCard variant="strong" padding="lg">
+          <div className="hidden lg:block mb-10">
+            <h1 className="font-playfair text-4xl font-bold text-espresso mb-2">Create Account</h1>
+            <p className="font-inter text-espresso-200">Join the LUXUDIES family</p>
+          </div>
+
+          <div className="space-y-6">
             {/* Google Sign Up */}
             <button
               onClick={handleGoogleSignUp}
-              className="w-full h-12 flex items-center justify-center gap-3 bg-white border border-pearl-400 rounded-[12px] text-sm font-inter font-medium text-espresso hover:bg-pearl-100 transition-colors mb-6"
+              className="w-full h-12 flex items-center justify-center gap-3 bg-white border border-gold-400/20 rounded-full text-sm font-inter font-medium text-espresso hover:bg-gold-50 hover:border-gold-400/40 transition-colors shadow-sm"
             >
               <GoogleIcon className="w-5 h-5" />
               Continue with Google
             </button>
 
             {/* Divider */}
-            <div className="flex items-center gap-4 mb-6">
-              <span className="flex-1 h-px bg-gold-400/10" />
-              <span className="text-xs font-inter text-espresso-100">or</span>
-              <span className="flex-1 h-px bg-gold-400/10" />
+            <div className="flex items-center gap-4">
+              <span className="flex-1 h-px bg-gold-400/20" />
+              <span className="text-[10px] font-inter uppercase tracking-widest text-espresso-200">Or sign up with email</span>
+              <span className="flex-1 h-px bg-gold-400/20" />
             </div>
 
-            <form onSubmit={handleSignUp} className="space-y-4">
+            <form onSubmit={handleSignUp} className="space-y-6">
               <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso-200" />
                 <input
                   type="text"
                   placeholder="Full Name *"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className={`${inputClasses} pl-11`}
+                  className={inputClasses}
                   required
                 />
               </div>
 
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso-200" />
                 <input
                   type="email"
                   placeholder="Email Address *"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`${inputClasses} pl-11`}
+                  className={inputClasses}
                   required
                 />
               </div>
 
               <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso-200" />
+                <span className="absolute left-1 top-1/2 -translate-y-1/2 text-sm font-inter text-espresso-300">+91</span>
                 <input
                   type="tel"
                   placeholder="Phone Number (optional)"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                  className={`${inputClasses} pl-11`}
+                  className={`${inputClasses} pl-10`}
                   maxLength={10}
                 />
               </div>
@@ -162,40 +186,44 @@ export default function SignUpPage() {
                   placeholder="Password (min 6 characters) *"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`${inputClasses} pr-12`}
+                  className={inputClasses}
                   required
                   minLength={6}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-espresso-200 hover:text-espresso"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-espresso-200 hover:text-espresso"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
 
-              <Button type="submit" fullWidth size="lg" isLoading={isLoading}>
-                CREATE ACCOUNT
-              </Button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full btn-gold h-12 text-xs tracking-widest shadow-gold mt-2"
+              >
+                {isLoading ? 'CREATING...' : 'CREATE ACCOUNT'}
+              </button>
             </form>
 
-            <p className="text-center text-[11px] font-inter text-espresso-100 mt-4">
+            <p className="text-center text-[11px] font-inter text-espresso-200 mt-4">
               By creating an account, you agree to our{' '}
-              <Link href="/policies/terms" className="text-gold-500 hover:underline">Terms</Link> and{' '}
-              <Link href="/policies/privacy" className="text-gold-500 hover:underline">Privacy Policy</Link>
+              <Link href="/policies/terms" className="text-gold-500 hover:text-gold-600 underline underline-offset-4 decoration-gold-400/30 hover:decoration-gold-500 transition-all">Terms</Link> and{' '}
+              <Link href="/policies/privacy" className="text-gold-500 hover:text-gold-600 underline underline-offset-4 decoration-gold-400/30 hover:decoration-gold-500 transition-all">Privacy Policy</Link>
             </p>
 
-            <p className="text-center text-sm font-inter text-espresso-200 mt-6">
+            <p className="text-center text-sm font-inter text-espresso-200 pt-6">
               Already have an account?{' '}
-              <Link href="/auth/login" className="text-gold-500 font-semibold hover:text-gold-600 transition-colors">
+              <Link href="/auth/login" className="text-espresso font-semibold hover:text-gold-500 underline underline-offset-4 decoration-gold-400/30 hover:decoration-gold-500 transition-all">
                 Sign In
               </Link>
             </p>
-          </GlassCard>
+          </div>
+
         </motion.div>
-      </main>
-      <MobileNav />
-    </>
+      </div>
+    </div>
   );
 }

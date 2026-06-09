@@ -4,25 +4,21 @@
 
 'use client';
 
-import { Truck, Shield, Banknote } from 'lucide-react';
-
-const announcements = [
-  { icon: Truck, text: 'FREE SHIPPING ACROSS TAMIL NADU' },
-  { icon: Shield, text: 'ANTI-TARNISH  |  WATER & SWEAT RESISTANT' },
-  { icon: Banknote, text: 'COD AVAILABLE  |  EASY RETURNS' },
-];
-
 export default function AnnouncementBar() {
+  const announcements = [
+    "Free shipping on orders above ₹999",
+    "Extra 10% off on your first order — Use code LUXE10",
+    "18K Gold Plated • Anti-Tarnish • Premium Quality"
+  ];
+
   return (
-    <div className="bg-espresso text-pearl overflow-hidden h-9 flex items-center relative z-50">
-      <div className="animate-marquee flex whitespace-nowrap">
-        {[...announcements, ...announcements, ...announcements].map((item, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-2 mx-8 text-[11px] sm:text-xs font-inter tracking-wider"
-          >
-            <item.icon className="w-3.5 h-3.5 text-gold-400 shrink-0" />
-            <span>{item.text}</span>
+    <div className="bg-pearl-100 border-b border-gold-400/20 text-espresso text-[11px] font-inter font-medium tracking-widest uppercase overflow-hidden whitespace-nowrap h-8 flex items-center">
+      <div className="animate-[marquee_20s_linear_infinite] flex items-center min-w-full">
+        {/* Repeat array twice for seamless marquee loop */}
+        {[...announcements, ...announcements].map((text, i) => (
+          <div key={i} className="flex items-center">
+            <span className="px-6">{text}</span>
+            <span className="w-1 h-1 rounded-full bg-gold-400 mx-2" />
           </div>
         ))}
       </div>

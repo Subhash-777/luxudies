@@ -27,6 +27,11 @@ export const metadata: Metadata = {
   creator: 'LUXUDIES',
   publisher: 'LUXUDIES',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  icons: {
+    icon: '/images/brand/logo.jpg',
+    shortcut: '/images/brand/logo.jpg',
+    apple: '/images/brand/logo.jpg',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_IN',
@@ -70,7 +75,20 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
+import { Playfair_Display, Inter } from 'next/font/google';
 import SmoothScroller from '@/components/layout/smooth-scroller';
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  display: 'swap',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 export default function RootLayout({
   children,
@@ -78,7 +96,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
+    <html lang="en" className={`scroll-smooth ${playfair.variable} ${inter.variable}`} data-scroll-behavior="smooth">
       <head>
         {/* Razorpay Script - loaded early for fast checkout */}
         <script src="https://checkout.razorpay.com/v1/checkout.js" async />
