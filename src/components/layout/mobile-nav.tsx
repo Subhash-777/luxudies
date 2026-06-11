@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Home, Grid, Search, ShoppingBag, User } from 'lucide-react';
@@ -14,6 +15,9 @@ export default function MobileNav() {
   const pathname = usePathname();
   const cartItemCount = useCartStore((s) => s.getItemCount());
   const openCart = useCartStore((s) => s.openCart);
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const navItems = [
     { href: '/', icon: Home, label: 'Home' },
@@ -45,7 +49,7 @@ export default function MobileNav() {
               >
                 <div className="relative">
                   <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-gold-500 fill-gold-500/20' : ''}`} />
-                  {cartItemCount > 0 && (
+                  {mounted && cartItemCount > 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}

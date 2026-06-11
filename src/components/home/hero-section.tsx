@@ -145,7 +145,7 @@ export default function HeroSection() {
                   Shop Collection
                 </button>
               </Link>
-              <Link href="/collections" className="w-full sm:w-auto">
+              <Link href="/shop" className="w-full sm:w-auto">
                 <button className="btn-ghost-gold w-full sm:w-auto px-8 py-4 text-[13px] uppercase tracking-widest bg-transparent transition-colors hover:bg-gold-50">
                   View Lookbook
                 </button>
