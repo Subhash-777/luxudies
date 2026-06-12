@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -16,6 +17,8 @@ import {
   Menu,
   X,
   ChevronRight,
+  ArrowRight,
+  TrendingUp,
 } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';
 import { useWishlistStore } from '@/store/wishlist-store';
@@ -29,14 +32,16 @@ const navLinks = [
   { href: '/shop/bestsellers', label: 'BESTSELLERS' },
   { href: '/shop/combo-offers', label: 'COMBO OFFERS' },
   { href: '/shop/gift-sets', label: 'GIFT SETS' },
-  { href: '/about', label: 'ABOUT US' },
-  { href: '/reviews', label: 'REVIEWS' },
 ];
 
+const trendingSearches = ['Necklace', 'Gold Hoops', 'Bracelet', 'Pearl Earrings', 'Gift Set'];
+
 export default function Header() {
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const cartItemCount = useCartStore((s) => s.getItemCount());
@@ -53,15 +58,36 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
+    document.body.style.overflow = isMobileMenuOpen || isSearchOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, isSearchOpen]);
 
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
-      searchInputRef.current.focus();
+      setTimeout(() => searchInputRef.current?.focus(), 100);
     }
   }, [isSearchOpen]);
+
+  // Close search on Escape
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsSearchOpen(false);
+    };
+    if (isSearchOpen) window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isSearchOpen]);
+
+  const handleSearch = (query: string) => {
+    if (!query.trim()) return;
+    setIsSearchOpen(false);
+    setSearchQuery('');
+    router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSearch(searchQuery);
+  };
 
   return (
     <>
@@ -112,7 +138,7 @@ export default function Header() {
 
             {/* Center: Desktop Navigation */}
             <nav className="hidden lg:flex flex-1 items-center justify-center gap-2 lg:gap-4 px-4">
-              {navLinks.slice(0, 6).map((link) => (
+              {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -127,34 +153,15 @@ export default function Header() {
             {/* Right: Actions */}
             <div className="flex items-center justify-end w-1/3 lg:w-auto gap-1 sm:gap-2">
               
-              {/* Expanding Search Bar */}
-              <div className="relative flex items-center justify-end">
-                <AnimatePresence>
-                  {isSearchOpen && (
-                    <motion.div
-                      initial={{ width: 0, opacity: 0 }}
-                      animate={{ width: 200, opacity: 1 }}
-                      exit={{ width: 0, opacity: 0 }}
-                      className="overflow-hidden absolute right-8 top-1/2 -translate-y-1/2"
-                    >
-                      <input
-                        ref={searchInputRef}
-                        type="text"
-                        placeholder="Search..."
-                        className="w-full bg-pearl-100 border border-gold-400/20 rounded-full py-1.5 px-4 text-sm font-inter text-espresso focus:outline-none focus:border-gold-400/50"
-                        onBlur={() => setIsSearchOpen(false)}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                <button
-                  onClick={() => setIsSearchOpen(!isSearchOpen)}
-                  className="p-2 text-espresso hover:text-gold-500 transition-colors hidden sm:flex z-10 relative"
-                  aria-label="Search"
-                >
-                  <Search className="w-5 h-5" />
-                </button>
-              </div>
+              {/* Search Button */}
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="p-2 text-espresso hover:text-gold-500 transition-colors relative group"
+                aria-label="Search"
+              >
+                <Search className="w-5 h-5" />
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gold-400 transition-all duration-300 group-hover:w-3/4 rounded-full" />
+              </button>
 
               <Link
                 href="/account/wishlist"
@@ -197,6 +204,109 @@ export default function Header() {
           </div>
         </div>
       </header>
+
+      {/* ========================================= */}
+      {/* Full-Screen Search Overlay */}
+      {/* ========================================= */}
+      <AnimatePresence>
+        {isSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[100] flex flex-col"
+          >
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-espresso/60 backdrop-blur-xl"
+              style={{ WebkitBackdropFilter: 'blur(20px)' }}
+              onClick={() => setIsSearchOpen(false)}
+            />
+
+            {/* Search Content */}
+            <div className="relative z-10 flex flex-col items-center justify-start pt-[15vh] sm:pt-[20vh] px-4 w-full">
+              {/* Close Button */}
+              <motion.button
+                initial={{ opacity: 0, rotate: -90 }}
+                animate={{ opacity: 1, rotate: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 0.1 }}
+                onClick={() => setIsSearchOpen(false)}
+                className="absolute top-6 right-6 p-3 text-pearl/70 hover:text-pearl transition-colors rounded-full hover:bg-white/10"
+                aria-label="Close search"
+              >
+                <X className="w-6 h-6" />
+              </motion.button>
+
+              {/* Search Label */}
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="font-inter text-xs font-semibold text-gold-400 uppercase tracking-[0.2em] mb-6"
+              >
+                Search LUXUDIES
+              </motion.p>
+
+              {/* Search Input */}
+              <motion.form
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                onSubmit={handleSearchSubmit}
+                className="w-full max-w-xl"
+              >
+                <div className="relative group">
+                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-pearl/40 group-focus-within:text-gold-400 transition-colors" />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="What are you looking for?"
+                    className="w-full h-14 sm:h-16 pl-14 pr-14 bg-white/10 border border-white/20 rounded-2xl text-base sm:text-lg font-inter text-pearl placeholder:text-pearl/30 focus:outline-none focus:border-gold-400/60 focus:bg-white/15 focus:ring-1 focus:ring-gold-400/30 transition-all"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="submit"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-gold-400 hover:bg-gold-500 text-white rounded-xl transition-colors"
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </motion.form>
+
+              {/* Trending Searches */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="mt-8 text-center"
+              >
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <TrendingUp className="w-3.5 h-3.5 text-gold-400/60" />
+                  <span className="text-[10px] font-inter font-semibold text-pearl/40 uppercase tracking-[0.15em]">
+                    Trending
+                  </span>
+                </div>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {trendingSearches.map((term) => (
+                    <button
+                      key={term}
+                      onClick={() => handleSearch(term)}
+                      className="px-4 py-2 bg-white/8 hover:bg-white/15 border border-white/10 hover:border-gold-400/30 text-sm font-inter text-pearl/60 hover:text-pearl rounded-full transition-all duration-200"
+                    >
+                      {term}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
@@ -243,6 +353,30 @@ export default function Header() {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
+
+                {/* Mobile Search Bar */}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (searchQuery.trim()) {
+                      setIsMobileMenuOpen(false);
+                      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+                      setSearchQuery('');
+                    }
+                  }}
+                  className="mb-6"
+                >
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso-200" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search jewelry..."
+                      className="w-full h-10 pl-10 pr-4 bg-pearl-200 border border-gold-400/10 rounded-xl text-sm font-inter text-espresso placeholder:text-espresso-100 focus:outline-none focus:border-gold-400/30 transition-colors"
+                    />
+                  </div>
+                </form>
 
                 {/* Nav Links */}
                 <nav className="space-y-1">
@@ -293,3 +427,4 @@ export default function Header() {
     </>
   );
 }
+
