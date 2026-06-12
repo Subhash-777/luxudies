@@ -1,5 +1,5 @@
 // ============================================
-// LUXUDIES - Mobile Navigation (Redesigned)
+// LUXUDIES - Mobile Navigation (Mobile-First)
 // ============================================
 
 'use client';
@@ -23,48 +23,60 @@ export default function MobileNav() {
     { href: '/', icon: Home, label: 'Home' },
     { href: '/shop', icon: Grid, label: 'Shop' },
     { href: '/search', icon: Search, label: 'Search' },
-    { href: '#cart', icon: ShoppingBag, label: 'Cart', action: openCart },
-    { href: '/account', icon: User, label: 'Account' },
+    { href: '#cart', icon: ShoppingBag, label: 'Bag', action: openCart },
+    { href: '/account', icon: User, label: 'You' },
   ];
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
-      {/* Mobile Nav Background - Pearl White with Blur */}
+      {/* Background */}
       <div 
-        className="absolute inset-0 bg-pearl-50/80 backdrop-blur-[16px] border-t border-gold-400/20"
-        style={{ WebkitBackdropFilter: 'blur(16px)' }}
+        className="absolute inset-0 bg-pearl/90 backdrop-blur-[20px] border-t border-gold-400/15"
+        style={{ WebkitBackdropFilter: 'blur(20px)' }}
       />
       
-      <nav className="relative flex items-center justify-around h-16 px-2 pb-safe">
+      <nav className="relative flex items-center justify-around h-[60px] px-1">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (pathname.startsWith('/shop') && item.href === '/shop');
+          const isActive = item.href === '#cart'
+            ? false
+            : pathname === item.href || (pathname.startsWith('/shop') && item.href === '/shop') || (pathname.startsWith('/search') && item.href === '/search');
           const Icon = item.icon;
+
+          const content = (
+            <div className="flex flex-col items-center gap-0.5">
+              <div className="relative">
+                <Icon className={`w-[20px] h-[20px] transition-colors ${isActive ? 'text-gold-500' : 'text-espresso-200'}`} />
+                {item.action && mounted && cartItemCount > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1.5 w-3.5 h-3.5 bg-gold-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center"
+                  >
+                    {cartItemCount}
+                  </motion.span>
+                )}
+              </div>
+              <span className={`text-[10px] font-inter font-medium transition-colors ${isActive ? 'text-gold-500' : 'text-espresso-200'}`}>
+                {item.label}
+              </span>
+              {isActive && (
+                <motion.div
+                  layoutId="mobile-nav-dot"
+                  className="absolute bottom-1 w-1 h-1 rounded-full bg-gold-500"
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                />
+              )}
+            </div>
+          );
 
           if (item.action) {
             return (
               <button
                 key={item.label}
                 onClick={item.action}
-                className="relative flex flex-col items-center justify-center w-full h-full text-espresso-200 hover:text-gold-500 transition-colors group"
+                className="relative flex items-center justify-center w-full h-full"
               >
-                <div className="relative">
-                  <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-gold-500 fill-gold-500/20' : ''}`} />
-                  {mounted && cartItemCount > 0 && (
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-antique text-white text-[10px] font-bold rounded-full flex items-center justify-center"
-                    >
-                      {cartItemCount}
-                    </motion.span>
-                  )}
-                </div>
-                {isActive && (
-                  <motion.div
-                    layoutId="mobile-nav-indicator"
-                    className="absolute bottom-1.5 w-1 h-1 rounded-full bg-gold-500"
-                  />
-                )}
+                {content}
               </button>
             );
           }
@@ -73,19 +85,15 @@ export default function MobileNav() {
             <Link
               key={item.label}
               href={item.href}
-              className="relative flex flex-col items-center justify-center w-full h-full text-espresso-200 hover:text-gold-500 transition-colors"
+              className="relative flex items-center justify-center w-full h-full"
             >
-              <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-gold-500 fill-gold-500/20' : ''}`} />
-              {isActive && (
-                <motion.div
-                  layoutId="mobile-nav-indicator"
-                  className="absolute bottom-1.5 w-1 h-1 rounded-full bg-gold-500"
-                />
-              )}
+              {content}
             </Link>
           );
         })}
       </nav>
+      {/* Safe area padding for notched phones */}
+      <div className="bg-pearl/90 pb-safe" style={{ WebkitBackdropFilter: 'blur(20px)' }} />
     </div>
   );
 }

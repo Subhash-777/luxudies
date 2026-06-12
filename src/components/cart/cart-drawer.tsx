@@ -143,7 +143,7 @@ export default function CartDrawer() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95, height: 0, marginTop: 0 }}
-                        className="flex gap-4 p-3 bg-white/50 backdrop-blur-md rounded-2xl border border-gold-400/10 shadow-sm"
+                        className="flex gap-3 sm:gap-4 p-3 bg-white/50 backdrop-blur-md rounded-2xl border border-gold-400/10 shadow-sm"
                       >
                         {/* Image */}
                         <div className="relative w-20 h-24 sm:w-24 sm:h-28 rounded-xl overflow-hidden bg-pearl-100 flex-shrink-0">
@@ -156,39 +156,39 @@ export default function CartDrawer() {
                         </div>
 
                         {/* Details */}
-                        <div className="flex flex-col flex-1 py-1">
-                          <div className="flex justify-between items-start mb-1">
-                            <h4 className="font-playfair text-base font-semibold text-espresso line-clamp-1">
+                        <div className="flex flex-col flex-1 min-w-0 py-0.5">
+                          <div className="flex justify-between items-start gap-2 mb-1">
+                            <h4 className="font-playfair text-sm sm:text-base font-semibold text-espresso line-clamp-2">
                               {item.product.name}
                             </h4>
                             <button
                               onClick={() => removeItem(item.product.id, item.variant_id)}
-                              className="text-espresso-200 hover:text-red-400 transition-colors"
+                              className="text-espresso-200 hover:text-red-400 transition-colors shrink-0 p-1 -mt-1 -mr-1"
                               aria-label="Remove item"
                             >
                               <X className="w-4 h-4" />
                             </button>
                           </div>
 
-                          <div className="font-inter font-bold text-espresso mb-auto">
+                          <div className="font-inter text-sm font-bold text-espresso mb-auto">
                             {formatPrice(item.product.price)}
                           </div>
 
                           {/* Quantity Controls */}
-                          <div className="flex items-center justify-between mt-4">
-                            <div className="flex items-center bg-ivory rounded-lg border border-gold-400/20">
+                          <div className="flex items-center mt-3">
+                            <div className="flex items-center bg-ivory rounded-lg border border-gold-400/20 h-8">
                               <button
                                 onClick={() => updateQuantity(item.product.id, item.variant_id, Math.max(1, item.quantity - 1))}
-                                className="w-8 h-8 flex items-center justify-center text-espresso-300 hover:text-espresso"
+                                className="w-8 h-full flex items-center justify-center text-espresso-300 hover:text-espresso"
                               >
                                 <Minus className="w-3 h-3" />
                               </button>
-                              <span className="w-8 text-center font-inter text-sm font-semibold text-espresso">
+                              <span className="w-6 text-center font-inter text-xs font-semibold text-espresso">
                                 {item.quantity}
                               </span>
                               <button
                                 onClick={() => updateQuantity(item.product.id, item.variant_id, item.quantity + 1)}
-                                className="w-8 h-8 flex items-center justify-center text-espresso-300 hover:text-espresso"
+                                className="w-8 h-full flex items-center justify-center text-espresso-300 hover:text-espresso"
                               >
                                 <Plus className="w-3 h-3" />
                               </button>

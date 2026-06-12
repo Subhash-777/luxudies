@@ -60,11 +60,11 @@ export default function AccountLayout({
             My Account
           </motion.h1>
 
-          <div className="grid lg:grid-cols-4 gap-8">
+          <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
             {/* Sidebar */}
             <div className="lg:col-span-1">
               {/* Horizontal scroll on mobile, vertical on desktop */}
-              <nav className="flex lg:flex-col overflow-x-auto scrollbar-hide gap-2 lg:gap-1 -mx-4 px-4 lg:mx-0 lg:px-0">
+              <nav className="flex lg:flex-col overflow-x-auto scrollbar-hide gap-3 lg:gap-1 pb-4 lg:pb-0">
                 {accountLinks.map((link) => {
                   const isActive = pathname === link.href;
                   return (
@@ -72,10 +72,10 @@ export default function AccountLayout({
                       key={link.href}
                       href={link.href}
                       className={cn(
-                        'flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-inter whitespace-nowrap transition-all shrink-0',
+                        'flex items-center gap-2.5 px-5 lg:px-4 py-3 lg:py-2.5 rounded-full lg:rounded-xl text-sm font-inter whitespace-nowrap transition-all shrink-0',
                         isActive
-                          ? 'bg-espresso text-pearl font-medium'
-                          : 'text-espresso-300 hover:bg-pearl-200'
+                          ? 'bg-espresso text-pearl font-medium shadow-md'
+                          : 'bg-pearl-200 lg:bg-transparent text-espresso-300 hover:bg-pearl-300'
                       )}
                     >
                       <link.icon className="w-4 h-4" />
@@ -86,7 +86,7 @@ export default function AccountLayout({
 
                 <button
                   onClick={handleSignOut}
-                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-inter text-red-500 hover:bg-red-50 transition-all whitespace-nowrap shrink-0 mt-2 lg:mt-4"
+                  className="flex items-center gap-2.5 px-5 lg:px-4 py-3 lg:py-2.5 rounded-full lg:rounded-xl text-sm font-inter text-red-500 hover:bg-red-50 transition-all whitespace-nowrap shrink-0 lg:mt-4 bg-red-50/50 lg:bg-transparent"
                 >
                   <LogOut className="w-4 h-4" />
                   Sign Out

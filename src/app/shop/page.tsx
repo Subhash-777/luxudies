@@ -120,15 +120,15 @@ export default function ShopPage() {
           </div>
 
           {/* Filter & Sort Bar */}
-          <div className="flex items-center justify-between gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             {/* Category Pills (scrollable on mobile) */}
-            <div className="flex overflow-x-auto scrollbar-hide gap-2 flex-1">
+            <div className="flex overflow-x-auto scrollbar-hide gap-2 w-full sm:w-auto pb-2 sm:pb-0">
               {categories.map((cat) => (
                 <button
                   key={cat.value}
                   onClick={() => setSelectedCategory(cat.value)}
                   className={cn(
-                    'px-4 py-2 text-xs font-inter font-medium rounded-full whitespace-nowrap transition-all',
+                    'px-4 py-2 text-xs font-inter font-medium rounded-full whitespace-nowrap transition-all shrink-0',
                     selectedCategory === cat.value
                       ? 'bg-espresso text-pearl'
                       : 'bg-pearl-200 text-espresso-300 hover:bg-pearl-300'
@@ -140,11 +140,11 @@ export default function ShopPage() {
             </div>
 
             {/* Sort Dropdown */}
-            <div className="relative shrink-0">
+            <div className="relative w-full sm:w-auto shrink-0">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none h-9 pl-3 pr-8 bg-pearl-200 text-xs font-inter font-medium text-espresso-300 rounded-full border-none focus:outline-none focus:ring-2 focus:ring-gold-400/20 cursor-pointer"
+                className="w-full sm:w-auto appearance-none h-10 sm:h-9 pl-4 pr-10 bg-pearl-200 text-sm sm:text-xs font-inter font-medium text-espresso-300 rounded-full border-none focus:outline-none focus:ring-2 focus:ring-gold-400/20 cursor-pointer"
               >
                 {sortOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -152,7 +152,7 @@ export default function ShopPage() {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-espresso-200 pointer-events-none" />
+              <ChevronDown className="absolute right-4 sm:right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-3.5 sm:h-3.5 text-espresso-200 pointer-events-none" />
             </div>
           </div>
 

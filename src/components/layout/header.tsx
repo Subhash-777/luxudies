@@ -1,5 +1,5 @@
 // ============================================
-// LUXUDIES - Header Component
+// LUXUDIES - Header Component (Mobile-First)
 // ============================================
 
 'use client';
@@ -68,7 +68,6 @@ export default function Header() {
     }
   }, [isSearchOpen]);
 
-  // Close search on Escape
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setIsSearchOpen(false);
@@ -106,31 +105,31 @@ export default function Header() {
         }}
       >
         <div className="container-luxury relative">
-          <div className="flex items-center justify-between h-16 lg:h-[72px]">
+          <div className="flex items-center justify-between h-14 sm:h-16 lg:h-[72px]">
             
-            {/* Left: Mobile Menu Trigger (Desktop hidden) */}
-            <div className="flex items-center w-1/3 lg:w-auto lg:hidden">
+            {/* Left: Mobile Menu Trigger */}
+            <div className="flex items-center lg:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 -ml-2 text-espresso hover:text-gold-500 transition-colors"
+                className="p-1.5 -ml-1.5 text-espresso hover:text-gold-500 transition-colors"
                 aria-label="Open menu"
               >
                 <Menu className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Center (Mobile) / Left (Desktop): Logo */}
-            <div className="flex justify-center w-1/3 lg:w-auto lg:justify-start">
+            {/* Logo */}
+            <div className="flex-1 flex justify-center lg:justify-start lg:flex-none">
               <Link href="/" className="flex items-center gap-2">
                 <Image
                   src="/images/brand/logo.jpg"
                   alt="LUXUDIES"
-                  width={40}
-                  height={40}
+                  width={36}
+                  height={36}
                   className="rounded-full border border-gold-400/20 hidden sm:block"
                   priority
                 />
-                <span className="font-playfair text-xl sm:text-2xl font-bold tracking-wide text-espresso">
+                <span className="font-playfair text-lg sm:text-xl lg:text-2xl font-bold tracking-wide text-espresso">
                   LUXUDIES
                 </span>
               </Link>
@@ -150,51 +149,53 @@ export default function Header() {
               ))}
             </nav>
 
-            {/* Right: Actions */}
-            <div className="flex items-center justify-end w-1/3 lg:w-auto gap-1 sm:gap-2">
+            {/* Right: Actions — only Wishlist + Cart on mobile */}
+            <div className="flex items-center gap-0.5 sm:gap-1">
               
-              {/* Search Button */}
+              {/* Search — desktop only (mobile has bottom nav search) */}
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="p-2 text-espresso hover:text-gold-500 transition-colors relative group"
+                className="hidden sm:flex p-2 text-espresso hover:text-gold-500 transition-colors relative group"
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" />
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gold-400 transition-all duration-300 group-hover:w-3/4 rounded-full" />
               </button>
 
+              {/* Wishlist */}
               <Link
                 href="/account/wishlist"
-                className="p-2 text-espresso hover:text-gold-500 transition-colors relative"
+                className="p-1.5 sm:p-2 text-espresso hover:text-gold-500 transition-colors relative"
                 aria-label="Wishlist"
               >
-                <Heart className="w-5 h-5" />
+                <Heart className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
                 {mounted && wishlistCount > 0 && (
-                  <span className="absolute top-0 right-0 w-4 h-4 bg-gold-400 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 sm:top-0 sm:right-0 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gold-400 text-white text-[8px] sm:text-[10px] font-bold rounded-full flex items-center justify-center">
                     {wishlistCount}
                   </span>
                 )}
               </Link>
 
+              {/* Account — desktop only */}
               <Link
                 href="/account"
-                className="p-2 text-espresso hover:text-gold-500 transition-colors hidden sm:flex"
+                className="hidden sm:flex p-2 text-espresso hover:text-gold-500 transition-colors"
                 aria-label="Account"
               >
                 <User className="w-5 h-5" />
               </Link>
 
+              {/* Cart */}
               <button
                 onClick={openCart}
-                className="p-2 text-espresso hover:text-gold-500 transition-colors relative"
+                className="p-1.5 sm:p-2 text-espresso hover:text-gold-500 transition-colors relative"
                 aria-label="Cart"
               >
-                <ShoppingBag className="w-5 h-5" />
+                <ShoppingBag className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
                 {mounted && cartItemCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute top-0 right-0 w-4 h-4 bg-gold-400 text-white text-[10px] font-bold rounded-full flex items-center justify-center"
+                    className="absolute -top-0.5 -right-0.5 sm:top-0 sm:right-0 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gold-400 text-white text-[8px] sm:text-[10px] font-bold rounded-full flex items-center justify-center"
                   >
                     {cartItemCount}
                   </motion.span>
@@ -217,16 +218,13 @@ export default function Header() {
             transition={{ duration: 0.25 }}
             className="fixed inset-0 z-[100] flex flex-col"
           >
-            {/* Backdrop */}
             <div
               className="absolute inset-0 bg-espresso/60 backdrop-blur-xl"
               style={{ WebkitBackdropFilter: 'blur(20px)' }}
               onClick={() => setIsSearchOpen(false)}
             />
 
-            {/* Search Content */}
             <div className="relative z-10 flex flex-col items-center justify-start pt-[15vh] sm:pt-[20vh] px-4 w-full">
-              {/* Close Button */}
               <motion.button
                 initial={{ opacity: 0, rotate: -90 }}
                 animate={{ opacity: 1, rotate: 0 }}
@@ -239,7 +237,6 @@ export default function Header() {
                 <X className="w-6 h-6" />
               </motion.button>
 
-              {/* Search Label */}
               <motion.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -249,7 +246,6 @@ export default function Header() {
                 Search LUXUDIES
               </motion.p>
 
-              {/* Search Input */}
               <motion.form
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -278,7 +274,6 @@ export default function Header() {
                 </div>
               </motion.form>
 
-              {/* Trending Searches */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -324,11 +319,11 @@ export default function Header() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 left-0 bottom-0 w-[300px] bg-pearl z-50 lg:hidden shadow-elevated overflow-y-auto"
+              className="fixed top-0 left-0 bottom-0 w-[280px] bg-pearl z-50 lg:hidden shadow-elevated overflow-y-auto"
             >
               <div className="p-5">
                 {/* Close + Logo */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-6">
                   <Link
                     href="/"
                     className="flex items-center gap-2"
@@ -337,11 +332,11 @@ export default function Header() {
                     <Image
                       src="/images/brand/logo.jpg"
                       alt="LUXUDIES"
-                      width={36}
-                      height={36}
+                      width={32}
+                      height={32}
                       className="rounded-full border border-gold-400/20"
                     />
-                    <span className="font-playfair text-lg font-bold text-espresso">
+                    <span className="font-playfair text-base font-bold text-espresso">
                       LUXUDIES
                     </span>
                   </Link>
@@ -364,7 +359,7 @@ export default function Header() {
                       setSearchQuery('');
                     }
                   }}
-                  className="mb-6"
+                  className="mb-5"
                 >
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso-200" />
@@ -379,7 +374,7 @@ export default function Header() {
                 </form>
 
                 {/* Nav Links */}
-                <nav className="space-y-1">
+                <nav className="space-y-0.5">
                   {navLinks.map((link, i) => (
                     <motion.div
                       key={link.href}
@@ -399,12 +394,12 @@ export default function Header() {
                   ))}
                 </nav>
 
-                {/* Divider */}
-                <div className="my-6 border-t border-gold-400/10" />
+                <div className="my-5 border-t border-gold-400/10" />
 
-                {/* Quick Links */}
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   {[
+                    { href: '/about', label: 'About Us' },
+                    { href: '/reviews', label: 'Reviews' },
                     { href: '/track-order', label: 'Track Order' },
                     { href: '/faq', label: 'FAQ' },
                     { href: '/contact', label: 'Contact Us' },
@@ -427,4 +422,3 @@ export default function Header() {
     </>
   );
 }
-
