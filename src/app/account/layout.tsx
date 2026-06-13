@@ -55,7 +55,7 @@ export default function AccountLayout({
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-playfair text-3xl lg:text-4xl font-bold text-espresso mb-8"
+            className="font-playfair text-2xl sm:text-3xl lg:text-4xl font-bold text-espresso mb-6 lg:mb-8"
           >
             My Account
           </motion.h1>
@@ -64,38 +64,40 @@ export default function AccountLayout({
             {/* Sidebar */}
             <div className="lg:col-span-1">
               {/* Horizontal scroll on mobile, vertical on desktop */}
-              <nav className="flex lg:flex-col overflow-x-auto scrollbar-hide gap-3 lg:gap-1 pb-4 lg:pb-0">
-                {accountLinks.map((link) => {
-                  const isActive = pathname === link.href;
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={cn(
-                        'flex items-center gap-2.5 px-5 lg:px-4 py-3 lg:py-2.5 rounded-full lg:rounded-xl text-sm font-inter whitespace-nowrap transition-all shrink-0',
-                        isActive
-                          ? 'bg-espresso text-pearl font-medium shadow-md'
-                          : 'bg-pearl-200 lg:bg-transparent text-espresso-300 hover:bg-pearl-300'
-                      )}
-                    >
-                      <link.icon className="w-4 h-4" />
-                      {link.label}
-                    </Link>
-                  );
-                })}
+              <div className="-mx-4 px-4 sm:mx-0 sm:px-0 lg:mx-0 lg:px-0">
+                <nav className="flex lg:flex-col overflow-x-auto scrollbar-hide gap-2 lg:gap-1 pb-4 lg:pb-0">
+                  {accountLinks.map((link) => {
+                    const isActive = pathname === link.href;
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={cn(
+                          'flex items-center gap-2 px-4 py-2.5 rounded-full lg:rounded-xl text-[13px] font-inter whitespace-nowrap transition-all shrink-0',
+                          isActive
+                            ? 'bg-espresso text-pearl font-medium shadow-sm'
+                            : 'bg-pearl-200 lg:bg-transparent text-espresso-300 hover:bg-pearl-300'
+                        )}
+                      >
+                        <link.icon className="w-4 h-4" />
+                        {link.label}
+                      </Link>
+                    );
+                  })}
 
-                <button
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2.5 px-5 lg:px-4 py-3 lg:py-2.5 rounded-full lg:rounded-xl text-sm font-inter text-red-500 hover:bg-red-50 transition-all whitespace-nowrap shrink-0 lg:mt-4 bg-red-50/50 lg:bg-transparent"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </button>
-              </nav>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full lg:rounded-xl text-[13px] font-inter text-red-500 hover:bg-red-50 transition-all whitespace-nowrap shrink-0 lg:mt-4 bg-red-50/50 lg:bg-transparent"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                </nav>
+              </div>
             </div>
 
             {/* Content */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-3 min-w-0">
               {children}
             </div>
           </div>

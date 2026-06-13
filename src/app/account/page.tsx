@@ -102,44 +102,44 @@ export default function ProfilePage() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-3xl"
+      className="w-full"
     >
-      <div className="flex items-center justify-between mb-8 border-b border-gold-400/20 pb-4">
-        <h2 className="font-playfair text-2xl font-bold text-espresso">
+      <div className="flex items-center justify-between mb-6 sm:mb-8 border-b border-gold-400/20 pb-4 gap-4">
+        <h2 className="font-playfair text-xl sm:text-2xl font-bold text-espresso">
           Personal Information
         </h2>
         {!isEditing && (
           <button 
             onClick={() => setIsEditing(true)}
-            className="text-xs font-inter font-semibold text-gold-600 hover:text-gold-700 uppercase tracking-widest border border-gold-400/20 px-4 py-2 rounded-full hover:bg-gold-50 transition-colors"
+            className="text-[11px] font-inter font-semibold text-gold-600 hover:text-gold-700 uppercase tracking-wider border border-gold-400/20 px-3 sm:px-4 py-2 rounded-full hover:bg-gold-50 transition-colors whitespace-nowrap shrink-0"
           >
-            Edit Profile
+            Edit
           </button>
         )}
       </div>
 
-      <div className="glass-card p-6 sm:p-10">
+      <div className="glass-card p-4 sm:p-6 lg:p-10">
         {/* Avatar */}
-        <div className="flex items-center gap-6 mb-10">
+        <div className="flex items-center gap-4 sm:gap-6 mb-8 sm:mb-10">
           {profile.avatarUrl ? (
             <img
               src={profile.avatarUrl}
               alt={profile.fullName}
-              className="w-20 h-20 rounded-full object-cover shadow-soft"
+              className="w-14 h-14 sm:w-20 sm:h-20 rounded-full object-cover shadow-soft shrink-0"
               referrerPolicy="no-referrer"
             />
           ) : (
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gold-300 to-gold-500 flex items-center justify-center text-white font-playfair text-3xl font-bold shadow-soft">
+            <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-gold-300 to-gold-500 flex items-center justify-center text-white font-playfair text-2xl sm:text-3xl font-bold shadow-soft shrink-0">
               {profile.fullName?.[0]?.toUpperCase() || '?'}
             </div>
           )}
-          <div>
-            <p className="font-playfair text-2xl font-bold text-espresso mb-1">{profile.fullName || 'No name set'}</p>
-            <p className="font-inter text-sm text-espresso-200">{profile.email}</p>
+          <div className="min-w-0">
+            <p className="font-playfair text-lg sm:text-2xl font-bold text-espresso mb-0.5 sm:mb-1 truncate">{profile.fullName || 'No name set'}</p>
+            <p className="font-inter text-xs sm:text-sm text-espresso-200 truncate">{profile.email}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6 sm:gap-y-8">
           <div>
             <label className={labelClasses}>Full Name</label>
             <div className="relative">

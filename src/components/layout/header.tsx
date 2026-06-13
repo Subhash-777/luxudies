@@ -150,12 +150,12 @@ export default function Header() {
             </nav>
 
             {/* Right: Actions — only Wishlist + Cart on mobile */}
-            <div className="flex items-center gap-0.5 sm:gap-1">
+            <div className="flex items-center">
               
               {/* Search — desktop only (mobile has bottom nav search) */}
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="hidden sm:flex p-2 text-espresso hover:text-gold-500 transition-colors relative group"
+                className="hidden sm:flex items-center justify-center w-10 h-10 text-espresso hover:text-gold-500 transition-colors"
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" />
@@ -164,12 +164,12 @@ export default function Header() {
               {/* Wishlist */}
               <Link
                 href="/account/wishlist"
-                className="p-1.5 sm:p-2 text-espresso hover:text-gold-500 transition-colors relative"
+                className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 text-espresso hover:text-gold-500 transition-colors relative"
                 aria-label="Wishlist"
               >
-                <Heart className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
+                <Heart className="w-5 h-5" />
                 {mounted && wishlistCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 sm:top-0 sm:right-0 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gold-400 text-white text-[8px] sm:text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute top-0.5 right-0 sm:top-0 sm:right-0 w-4 h-4 bg-gold-400 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                     {wishlistCount}
                   </span>
                 )}
@@ -178,7 +178,7 @@ export default function Header() {
               {/* Account — desktop only */}
               <Link
                 href="/account"
-                className="hidden sm:flex p-2 text-espresso hover:text-gold-500 transition-colors"
+                className="hidden sm:flex items-center justify-center w-10 h-10 text-espresso hover:text-gold-500 transition-colors"
                 aria-label="Account"
               >
                 <User className="w-5 h-5" />
@@ -187,15 +187,15 @@ export default function Header() {
               {/* Cart */}
               <button
                 onClick={openCart}
-                className="p-1.5 sm:p-2 text-espresso hover:text-gold-500 transition-colors relative"
+                className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 text-espresso hover:text-gold-500 transition-colors relative"
                 aria-label="Cart"
               >
-                <ShoppingBag className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
+                <ShoppingBag className="w-5 h-5" />
                 {mounted && cartItemCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute -top-0.5 -right-0.5 sm:top-0 sm:right-0 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gold-400 text-white text-[8px] sm:text-[10px] font-bold rounded-full flex items-center justify-center"
+                    className="absolute top-0.5 right-0 sm:top-0 sm:right-0 w-4 h-4 bg-gold-400 text-white text-[9px] font-bold rounded-full flex items-center justify-center"
                   >
                     {cartItemCount}
                   </motion.span>
