@@ -69,13 +69,13 @@ export default function CartDrawer() {
             onClick={closeCart}
           />
 
-          {/* Drawer */}
+          {/* Drawer panel */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 bottom-0 w-[90vw] max-w-[420px] bg-pearl/95 backdrop-blur-2xl z-50 flex flex-col shadow-[-20px_0_40px_rgba(58,42,30,0.1)] border-l border-gold-400/20"
+            className="fixed top-0 right-0 bottom-[60px] lg:bottom-0 w-[90vw] max-w-[420px] bg-pearl/95 backdrop-blur-2xl z-50 flex flex-col min-h-0 shadow-[-20px_0_40px_rgba(58,42,30,0.1)] border-l border-gold-400/20"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gold-400/10">
@@ -113,8 +113,8 @@ export default function CartDrawer() {
               </div>
             </div>
 
-            {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
+            {/* Cart Items — scrollable area */}
+            <div className="flex-1 min-h-0 overflow-y-auto p-5 lg:p-6" style={{ WebkitOverflowScrolling: 'touch' }}>
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <div className="w-16 h-16 rounded-full bg-ivory flex items-center justify-center mb-6 border border-gold-400/20">
