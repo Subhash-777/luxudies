@@ -17,10 +17,10 @@ export default function WishlistPage() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl"
+      className="w-full"
     >
-      <div className="flex items-center justify-between mb-8 border-b border-gold-400/20 pb-4">
-        <h2 className="font-playfair text-2xl font-bold text-espresso">
+      <div className="flex items-center justify-between mb-6 border-b border-gold-400/20 pb-4">
+        <h2 className="font-playfair text-xl sm:text-2xl font-bold text-espresso">
           My Wishlist
         </h2>
       </div>
@@ -43,7 +43,7 @@ export default function WishlistPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 gap-3 sm:gap-6">
           {items.map((product, i) => (
             <ProductCard key={product.id} product={product} index={i} />
           ))}

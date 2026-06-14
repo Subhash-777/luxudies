@@ -1,5 +1,5 @@
 // ============================================
-// LUXUDIES - Account Layout
+// LUXUDIES - Account Layout (Mobile-First Redesign)
 // ============================================
 
 'use client';
@@ -7,7 +7,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { User, Package, Heart, MapPin, LogOut, Settings } from 'lucide-react';
+import { User, Package, Heart, MapPin, LogOut, Settings, ChevronRight } from 'lucide-react';
 import Header from '@/components/layout/header';
 import MobileNav from '@/components/layout/mobile-nav';
 import Footer from '@/components/layout/footer';
@@ -51,21 +51,63 @@ export default function AccountLayout({
     <>
       <Header />
       <main className="min-h-screen pb-24 lg:pb-0">
-        <div className="container-luxury py-6 lg:py-10">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="font-playfair text-2xl sm:text-3xl lg:text-4xl font-bold text-espresso mb-6 lg:mb-8"
-          >
-            My Account
-          </motion.h1>
 
-          <div className="grid lg:grid-cols-4 gap-6 lg:gap-8">
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              {/* Horizontal scroll on mobile, vertical on desktop */}
-              <div className="-mx-4 px-4 sm:mx-0 sm:px-0 lg:mx-0 lg:px-0">
-                <nav className="flex lg:flex-col overflow-x-auto scrollbar-hide gap-2 lg:gap-1 pb-4 lg:pb-0">
+        {/* ─── MOBILE LAYOUT ────────────────────────── */}
+        <div className="lg:hidden">
+          {/* Page header */}
+          <div className="bg-pearl border-b border-gold-400/10 px-4 pt-5 pb-0">
+            <motion.h1
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="font-playfair text-2xl font-bold text-espresso mb-4"
+            >
+              My Account
+            </motion.h1>
+
+            {/* Tab bar — full-width scrollable, flush with screen edges */}
+            <nav className="flex overflow-x-auto scrollbar-hide -mx-4 px-4 gap-1">
+              {accountLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      'flex items-center gap-1.5 px-3 py-2.5 text-xs font-inter font-medium whitespace-nowrap shrink-0 border-b-2 transition-all',
+                      isActive
+                        ? 'border-gold-500 text-gold-600 font-semibold'
+                        : 'border-transparent text-espresso-200 hover:text-espresso-400'
+                    )}
+                  >
+                    <link.icon className="w-3.5 h-3.5" />
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Page content */}
+          <div className="px-4 py-5">
+            {children}
+          </div>
+        </div>
+
+        {/* ─── DESKTOP LAYOUT ───────────────────────── */}
+        <div className="hidden lg:block">
+          <div className="container-luxury py-10">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="font-playfair text-4xl font-bold text-espresso mb-8"
+            >
+              My Account
+            </motion.h1>
+
+            <div className="grid lg:grid-cols-4 gap-8">
+              {/* Desktop sidebar */}
+              <div className="lg:col-span-1">
+                <nav className="flex flex-col gap-1">
                   {accountLinks.map((link) => {
                     const isActive = pathname === link.href;
                     return (
@@ -73,35 +115,37 @@ export default function AccountLayout({
                         key={link.href}
                         href={link.href}
                         className={cn(
-                          'flex items-center gap-2 px-4 py-2.5 rounded-full lg:rounded-xl text-[13px] font-inter whitespace-nowrap transition-all shrink-0',
+                          'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-inter transition-all',
                           isActive
                             ? 'bg-espresso text-pearl font-medium shadow-sm'
-                            : 'bg-pearl-200 lg:bg-transparent text-espresso-300 hover:bg-pearl-300'
+                            : 'text-espresso-300 hover:bg-pearl-200 hover:text-espresso'
                         )}
                       >
-                        <link.icon className="w-4 h-4" />
+                        <link.icon className="w-4 h-4 shrink-0" />
                         {link.label}
+                        {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto opacity-50" />}
                       </Link>
                     );
                   })}
 
                   <button
                     onClick={handleSignOut}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-full lg:rounded-xl text-[13px] font-inter text-red-500 hover:bg-red-50 transition-all whitespace-nowrap shrink-0 lg:mt-4 bg-red-50/50 lg:bg-transparent"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-inter text-red-500 hover:bg-red-50 transition-all mt-4"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut className="w-4 h-4 shrink-0" />
                     Sign Out
                   </button>
                 </nav>
               </div>
-            </div>
 
-            {/* Content */}
-            <div className="lg:col-span-3 min-w-0">
-              {children}
+              {/* Desktop content */}
+              <div className="lg:col-span-3 min-w-0">
+                {children}
+              </div>
             </div>
           </div>
         </div>
+
       </main>
       <Footer />
       <CartDrawer />

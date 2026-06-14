@@ -46,10 +46,10 @@ export default function OrdersPage() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl"
+      className="w-full"
     >
-      <div className="flex items-center justify-between mb-8 border-b border-gold-400/20 pb-4">
-        <h2 className="font-playfair text-2xl font-bold text-espresso">
+      <div className="flex items-center justify-between mb-6 border-b border-gold-400/20 pb-4">
+        <h2 className="font-playfair text-xl sm:text-2xl font-bold text-espresso">
           My Orders
         </h2>
       </div>
@@ -80,9 +80,9 @@ export default function OrdersPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
             >
-              <div className="glass-card p-6 sm:p-8">
+              <div className="glass-card p-4 sm:p-6 lg:p-8">
                 {/* Order Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-gold-400/10">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-5 border-b border-gold-400/10">
                   <div>
                     <p className="font-playfair font-bold text-lg text-espresso mb-1">
                       Order #{order.id}

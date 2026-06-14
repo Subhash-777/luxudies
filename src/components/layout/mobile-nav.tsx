@@ -62,7 +62,7 @@ export default function MobileNav() {
               {isActive && (
                 <motion.div
                   layoutId="mobile-nav-dot"
-                  className="absolute bottom-1 w-1 h-1 rounded-full bg-gold-500"
+                  className="w-1 h-1 rounded-full bg-gold-500"
                   transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 />
               )}
@@ -92,8 +92,8 @@ export default function MobileNav() {
           );
         })}
       </nav>
-      {/* Safe area padding for notched phones */}
-      <div className="bg-pearl/90 pb-safe" style={{ WebkitBackdropFilter: 'blur(20px)' }} />
+      {/* Safe area for iPhones with home bar */}
+      <div className="bg-pearl/90" style={{ height: 'env(safe-area-inset-bottom)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }} />
     </div>
   );
 }

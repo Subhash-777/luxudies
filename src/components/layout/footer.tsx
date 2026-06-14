@@ -11,10 +11,10 @@ export default function Footer() {
   return (
     <footer className="bg-ivory-50 text-espresso pt-16 lg:pt-24 pb-24 lg:pb-8 border-t border-gold-400/20">
       <div className="container-luxury">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-8 mb-12 sm:mb-16">
           
           {/* Column 1: Brand */}
-          <div className="flex flex-col items-center md:items-start text-center md:text-left">
+          <div className="flex flex-col items-center sm:col-span-2 lg:col-span-1 lg:items-start text-center lg:text-left">
             <Link href="/" className="flex items-center gap-2 mb-6">
               <Image
                 src="/images/brand/logo.jpg"
