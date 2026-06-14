@@ -15,9 +15,15 @@ export default function MobileNav() {
   const pathname = usePathname();
   const cartItemCount = useCartStore((s) => s.getItemCount());
   const openCart = useCartStore((s) => s.openCart);
+  const closeCart = useCartStore((s) => s.closeCart);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  // Close the cart drawer when navigating to any non-cart tab on mobile
+  const handleNavClick = () => {
+    closeCart();
+  };
 
   const navItems = [
     { href: '/', icon: Home, label: 'Home' },
@@ -69,6 +75,7 @@ export default function MobileNav() {
             </div>
           );
 
+          // Cart tab: just open cart (no close-on-click needed)
           if (item.action) {
             return (
               <button
@@ -81,10 +88,12 @@ export default function MobileNav() {
             );
           }
 
+          // All other tabs: close the cart drawer first, then navigate
           return (
             <Link
               key={item.label}
               href={item.href}
+              onClick={handleNavClick}
               className="relative flex items-center justify-center w-full h-full"
             >
               {content}
