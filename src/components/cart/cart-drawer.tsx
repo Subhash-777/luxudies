@@ -30,11 +30,14 @@ export default function CartDrawer() {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
     };
   }, [isOpen]);
 
@@ -75,10 +78,10 @@ export default function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 bottom-[60px] lg:bottom-0 w-[90vw] max-w-[420px] bg-pearl/95 backdrop-blur-2xl z-50 flex flex-col min-h-0 shadow-[-20px_0_40px_rgba(58,42,30,0.1)] border-l border-gold-400/20"
+            className="fixed top-0 right-0 bottom-[60px] lg:bottom-0 w-[90vw] max-w-[420px] bg-pearl/95 backdrop-blur-2xl z-50 flex flex-col overflow-hidden shadow-[-20px_0_40px_rgba(58,42,30,0.1)] border-l border-gold-400/20"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gold-400/10">
+            <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-gold-400/10">
               <h2 className="font-playfair text-2xl font-bold text-espresso flex items-center gap-2">
                 Your Bag
                 <span className="font-inter text-sm font-medium text-espresso-200 bg-gold-50 px-2 py-0.5 rounded-full">
@@ -95,7 +98,7 @@ export default function CartDrawer() {
             </div>
 
             {/* Free Shipping Progress */}
-            <div className="p-6 bg-ivory-50/50 border-b border-gold-400/10">
+            <div className="flex-shrink-0 p-6 bg-ivory-50/50 border-b border-gold-400/10">
               <p className="font-inter text-sm text-espresso-300 mb-3 text-center">
                 {amountToFreeShipping > 0 ? (
                   <>Add <span className="font-bold text-gold-600">{formatPrice(amountToFreeShipping)}</span> more to unlock Free Shipping</>
@@ -114,7 +117,7 @@ export default function CartDrawer() {
             </div>
 
             {/* Cart Items — scrollable area */}
-            <div className="flex-1 min-h-0 overflow-y-auto p-5 lg:p-6" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="flex-1 overflow-y-auto overscroll-contain p-5 lg:p-6" style={{ WebkitOverflowScrolling: 'touch' }}>
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <div className="w-16 h-16 rounded-full bg-ivory flex items-center justify-center mb-6 border border-gold-400/20">
@@ -204,7 +207,7 @@ export default function CartDrawer() {
 
             {/* Footer / Checkout */}
             {items.length > 0 && (
-              <div className="p-6 bg-white/80 backdrop-blur-xl border-t border-gold-400/20 shadow-[0_-10px_40px_rgba(58,42,30,0.05)]">
+              <div className="flex-shrink-0 mt-auto p-6 bg-white/80 backdrop-blur-xl border-t border-gold-400/20 shadow-[0_-10px_40px_rgba(58,42,30,0.05)]">
                 <div className="flex items-center justify-between mb-4">
                   <span className="font-inter font-medium text-espresso-300">Subtotal</span>
                   <span className="font-inter font-bold text-xl text-espresso">
