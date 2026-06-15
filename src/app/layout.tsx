@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'LUXUDIES' }],
   creator: 'LUXUDIES',
   publisher: 'LUXUDIES',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')),
   icons: {
     icon: '/images/brand/logo.jpg',
     shortcut: '/images/brand/logo.jpg',

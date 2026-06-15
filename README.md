@@ -39,7 +39,9 @@ A premium, mobile-first luxury jewelry ecommerce website built for **LUXUDIES**.
    NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_your_key
    RAZORPAY_KEY_SECRET=your_secret
    
-   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   NEXT_PUBLIC_SITE_URL=https://luxudies.vercel.app # Or your production domain
+   NEXT_PUBLIC_SITE_NAME=LUXUDIES
+   NEXT_PUBLIC_WHATSAPP_NUMBER=+919876543210
    ```
 
 3. **Database Setup (Supabase):**
@@ -51,7 +53,7 @@ A premium, mobile-first luxury jewelry ecommerce website built for **LUXUDIES**.
    ```bash
    npm run dev
    ```
-   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the local result.
 
 ## 🚀 Vercel Deployment Compatibility
 
