@@ -88,13 +88,21 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: getTotal(),
-          items: items.map((item) => ({
-            product_id: item.product.id,
-            name: item.product.name,
-            price: item.product.price,
-            quantity: item.quantity,
-          })),
+          subtotal: getSubtotal(),
+          shippingCost: 0,
+          total: getTotal(),
+          items: items.map((item) => {
+            const primaryImage = item.product.images?.find((img) => img.is_primary) || item.product.images?.[0];
+            return {
+              product_id: item.product.id,
+              variant_id: item.variant?.id || null,
+              name: item.product.name,
+              product_image: primaryImage?.url || null,
+              variant_info: item.variant ? `${item.variant.name}: ${item.variant.value}` : null,
+              price: item.product.price + (item.variant?.price_adjustment || 0),
+              quantity: item.quantity,
+            };
+          }),
           address,
         }),
       });

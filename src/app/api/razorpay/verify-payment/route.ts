@@ -31,15 +31,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Save order to Supabase database
-    // TODO: Send confirmation email/SMS
-    // TODO: Update product stock
+    // Update order in Supabase
+    const supabaseAdmin = await (await import('@/lib/supabase/server')).createAdminClient();
+    
+    // First, find the order by razorpay_order_id
+    const { data: order, error: findError } = await supabaseAdmin
+      .from('orders')
+      .select('id, order_number')
+      .eq('razorpay_order_id', razorpay_order_id)
+      .single();
 
-    const orderNumber = `LXD-${Date.now().toString(36).toUpperCase()}`;
+    if (findError || !order) {
+      throw new Error(`Order not found for razorpay_order_id: ${razorpay_order_id}`);
+    }
+
+    // Update the status
+    const { error: updateError } = await supabaseAdmin
+      .from('orders')
+      .update({
+        payment_status: 'paid',
+        status: 'confirmed',
+        razorpay_payment_id: razorpay_payment_id,
+        razorpay_signature: razorpay_signature,
+      })
+      .eq('id', order.id);
+
+    if (updateError) {
+      throw new Error(`Failed to update order status: ${updateError.message}`);
+    }
+
+    // Add entry to order_status_history
+    await supabaseAdmin.from('order_status_history').insert({
+      order_id: order.id,
+      status: 'confirmed',
+      note: 'Payment verified and order confirmed',
+    });
 
     return NextResponse.json({
       success: true,
-      orderNumber,
+      orderNumber: order.order_number,
       paymentId: razorpay_payment_id,
     });
   } catch (error) {
