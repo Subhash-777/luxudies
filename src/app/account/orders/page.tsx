@@ -4,34 +4,15 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Package, Eye } from 'lucide-react';
+import { Package, Eye, Loader2 } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
 
-// Sample orders for display
-const SAMPLE_ORDERS = [
-  {
-    id: 'LXD-A1B2C3',
-    date: '2026-05-28',
-    status: 'delivered',
-    total: 348,
-    items: [
-      { name: 'Enchanted Bow Pendant Necklace', price: 149, quantity: 1, image: '/images/products/bow-necklace.jpg' },
-      { name: 'Golden Radiance Hoop Earrings', price: 99, quantity: 2, image: '/images/products/bracelet.jpg' },
-    ],
-  },
-  {
-    id: 'LXD-D4E5F6',
-    date: '2026-06-01',
-    status: 'shipped',
-    total: 179,
-    items: [
-      { name: 'Infinity Love Pendant Chain', price: 179, quantity: 1, image: '/images/products/ring.jpg' },
-    ],
-  },
-];
+// Removed SAMPLE_ORDERS
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-50/50 text-yellow-700 border-yellow-200',
@@ -42,6 +23,57 @@ const statusColors: Record<string, string> = {
 };
 
 export default function OrdersPage() {
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchOrders() {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setLoading(false);
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from('orders')
+          .select(`
+            id,
+            order_number,
+            created_at,
+            status,
+            total,
+            order_items (
+              product_name,
+              price,
+              quantity,
+              product_image
+            )
+          `)
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setOrders(data || []);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchOrders();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="w-full h-64 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-gold-500 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -54,7 +86,7 @@ export default function OrdersPage() {
         </h2>
       </div>
 
-      {SAMPLE_ORDERS.length === 0 ? (
+      {orders.length === 0 ? (
         <div className="glass-card p-12 text-center py-20 flex flex-col items-center justify-center">
           <div className="w-20 h-20 rounded-full bg-pearl-100 flex items-center justify-center mb-6 shadow-inner border border-gold-400/10">
             <Package className="w-8 h-8 text-gold-300" />
@@ -73,7 +105,7 @@ export default function OrdersPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          {SAMPLE_ORDERS.map((order, i) => (
+          {orders.map((order, i) => (
             <motion.div
               key={order.id}
               initial={{ opacity: 0, y: 10 }}
@@ -85,10 +117,10 @@ export default function OrdersPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-5 border-b border-gold-400/10">
                   <div>
                     <p className="font-playfair font-bold text-lg text-espresso mb-1">
-                      Order #{order.id}
+                      Order #{order.order_number}
                     </p>
                     <p className="font-inter text-xs text-espresso-200 uppercase tracking-widest">
-                      {new Date(order.date).toLocaleDateString('en-IN', {
+                      {new Date(order.created_at).toLocaleDateString('en-IN', {
                         day: 'numeric',
                         month: 'long',
                         year: 'numeric',
@@ -102,13 +134,13 @@ export default function OrdersPage() {
 
                 {/* Items */}
                 <div className="space-y-4 mb-6">
-                  {order.items.map((item, j) => (
+                  {order.order_items.map((item: any, j: number) => (
                     <div key={j} className="flex items-center gap-4 p-3 hover:bg-white/40 transition-colors rounded-xl">
                       <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-pearl-100 shrink-0 border border-gold-400/10 shadow-sm">
-                        <Image src={item.image} alt={item.name} fill className="object-cover" sizes="64px" />
+                        <Image src={item.product_image || '/images/products/placeholder.jpg'} alt={item.product_name} fill className="object-cover" sizes="64px" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-playfair text-sm font-semibold text-espresso line-clamp-1 mb-1">{item.name}</p>
+                        <p className="font-playfair text-sm font-semibold text-espresso line-clamp-1 mb-1">{item.product_name}</p>
                         <p className="font-inter text-[11px] text-espresso-200 uppercase tracking-widest">Qty: {item.quantity}</p>
                       </div>
                       <span className="font-inter text-sm font-bold text-antique shrink-0">
@@ -125,7 +157,7 @@ export default function OrdersPage() {
                     <span className="font-bold text-lg text-espresso">{formatPrice(order.total)}</span>
                   </p>
                   <Link
-                    href={`/track-order?order=${order.id}`}
+                    href={`/track-order?order=${order.order_number}`}
                   >
                     <button className="btn-ghost-gold px-6 py-2 text-[10px] sm:text-xs flex items-center gap-2">
                       <Eye className="w-3.5 h-3.5" />

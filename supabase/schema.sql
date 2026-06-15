@@ -316,7 +316,23 @@ CREATE TABLE IF NOT EXISTS public.wishlists (
 
 
 -- ============================================
--- 15. ROW LEVEL SECURITY (RLS)
+-- 15. CART ITEMS TABLE
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS public.cart_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  variant_id UUID REFERENCES public.product_variants(id) ON DELETE SET NULL,
+  quantity INT NOT NULL DEFAULT 1,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, product_id, variant_id)
+);
+
+
+-- ============================================
+-- 16. ROW LEVEL SECURITY (RLS)
 -- ============================================
 
 -- Enable RLS on all tables
@@ -334,6 +350,7 @@ ALTER TABLE public.combos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.combo_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.banners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.wishlists ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
 
 -- ---- PUBLIC READ policies (for storefront) ----
 
@@ -372,6 +389,12 @@ CREATE POLICY "Users can read own wishlist" ON public.wishlists FOR SELECT USING
 CREATE POLICY "Users can add to wishlist" ON public.wishlists FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can remove from wishlist" ON public.wishlists FOR DELETE USING (auth.uid() = user_id);
 
+-- Users can manage their own cart
+CREATE POLICY "Users can read own cart" ON public.cart_items FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can add to cart" ON public.cart_items FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own cart" ON public.cart_items FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can remove from cart" ON public.cart_items FOR DELETE USING (auth.uid() = user_id);
+
 -- Users can submit reviews
 CREATE POLICY "Users can create reviews" ON public.reviews FOR INSERT WITH CHECK (auth.uid() = user_id);
 
@@ -399,6 +422,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_status ON public.orders(status);
 CREATE INDEX IF NOT EXISTS idx_order_items_order ON public.order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_product ON public.reviews(product_id);
 CREATE INDEX IF NOT EXISTS idx_wishlists_user ON public.wishlists(user_id);
+CREATE INDEX IF NOT EXISTS idx_cart_items_user ON public.cart_items(user_id);
 CREATE INDEX IF NOT EXISTS idx_addresses_user ON public.addresses(user_id);
 
 
@@ -424,6 +448,9 @@ CREATE TRIGGER set_orders_updated_at BEFORE UPDATE ON public.orders
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
 CREATE TRIGGER set_addresses_updated_at BEFORE UPDATE ON public.addresses
+  FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_cart_items_updated_at BEFORE UPDATE ON public.cart_items
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
 

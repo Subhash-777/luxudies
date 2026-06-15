@@ -4,43 +4,55 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Plus, Pencil, Trash2 } from 'lucide-react';
+import { MapPin, Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import GlassCard from '@/components/ui/glass-card';
 import Button from '@/components/ui/button';
 import toast from 'react-hot-toast';
+import { createClient } from '@/lib/supabase/client';
 
-interface SavedAddress {
-  id: string;
-  label: string;
-  fullName: string;
-  phone: string;
-  line1: string;
-  line2: string;
-  city: string;
-  state: string;
-  pincode: string;
-  isDefault: boolean;
-}
-
-const SAMPLE_ADDRESSES: SavedAddress[] = [
-  {
-    id: 'addr_1',
-    label: 'Home',
-    fullName: 'Priya Menon',
-    phone: '+91 98765 43210',
-    line1: '42, Lotus Gardens, Anna Nagar',
-    line2: 'Near Koyambedu Metro',
-    city: 'Chennai',
-    state: 'Tamil Nadu',
-    pincode: '600040',
-    isDefault: true,
-  },
-];
+// Removed SAMPLE_ADDRESSES
 
 export default function AddressesPage() {
-  const [addresses] = useState<SavedAddress[]>(SAMPLE_ADDRESSES);
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchAddresses() {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setLoading(false);
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from('addresses')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('is_default', { ascending: false });
+
+        if (error) throw error;
+        setAddresses(data || []);
+      } catch (error) {
+        console.error('Error fetching addresses:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAddresses();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="w-full h-64 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-gold-500 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -71,7 +83,7 @@ export default function AddressesPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {addresses.map((addr) => (
             <GlassCard key={addr.id} variant="strong" padding="md" className="relative">
-              {addr.isDefault && (
+              {addr.is_default && (
                 <span className="absolute top-3 right-3 text-[10px] font-inter font-semibold text-gold-500 bg-gold-50 px-2 py-0.5 rounded-full">
                   DEFAULT
                 </span>
@@ -80,7 +92,7 @@ export default function AddressesPage() {
                 <MapPin className="w-4 h-4 text-gold-500" />
                 <span className="font-inter font-semibold text-sm text-espresso">{addr.label}</span>
               </div>
-              <p className="font-inter text-sm text-espresso mb-0.5">{addr.fullName}</p>
+              <p className="font-inter text-sm text-espresso mb-0.5">{addr.full_name}</p>
               <p className="font-inter text-xs text-espresso-200 leading-relaxed">
                 {addr.line1}<br />
                 {addr.line2 && <>{addr.line2}<br /></>}

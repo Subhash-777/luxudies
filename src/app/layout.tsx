@@ -4,6 +4,7 @@
 
 import type { Metadata, Viewport } from 'next';
 import { Toaster } from 'react-hot-toast';
+import StoreInitializer from '@/components/layout/store-initializer';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -102,6 +103,7 @@ export default function RootLayout({
         <script src="https://checkout.razorpay.com/v1/checkout.js" async />
       </head>
       <body className="bg-pearl text-espresso font-inter antialiased">
+        <StoreInitializer />
         <SmoothScroller>
           {children}
         </SmoothScroller>
