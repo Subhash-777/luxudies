@@ -28,6 +28,18 @@ export const useWishlistStore = create<WishlistStore>()(
       items: [],
 
       addItem: async (product) => {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          import('react-hot-toast').then(toast => {
+            toast.default.error('Please sign in to add items to your wishlist');
+          });
+          if (typeof window !== 'undefined') {
+            window.location.href = '/auth/login?redirect=/shop';
+          }
+          return;
+        }
+
         let isNew = false;
         set((state) => {
           if (state.items.find((item) => item.id === product.id)) return state;

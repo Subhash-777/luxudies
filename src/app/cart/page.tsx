@@ -207,11 +207,24 @@ export default function CartPage() {
                   </p>
                 </div>
 
-                <Link href="/checkout">
-                  <Button fullWidth size="lg" icon={<ArrowRight className="w-4 h-4" />} iconPosition="right">
-                    PROCEED TO CHECKOUT
-                  </Button>
-                </Link>
+                <Button 
+                  fullWidth 
+                  size="lg" 
+                  icon={<ArrowRight className="w-4 h-4" />} 
+                  iconPosition="right"
+                  onClick={async () => {
+                    const supabase = (await import('@/lib/supabase/client')).createClient();
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) {
+                      import('react-hot-toast').then(toast => toast.default.error('Please sign in to proceed to checkout'));
+                      window.location.href = '/auth/login?redirect=/checkout';
+                      return;
+                    }
+                    window.location.href = '/checkout';
+                  }}
+                >
+                  PROCEED TO CHECKOUT
+                </Button>
 
                 {/* Trust */}
                 <div className="flex items-center justify-center gap-2 mt-4">

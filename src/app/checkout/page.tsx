@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -15,6 +15,7 @@ import CartDrawer from '@/components/cart/cart-drawer';
 import { useCartStore } from '@/store/cart-store';
 import { formatPrice } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { createClient } from '@/lib/supabase/client';
 
 interface AddressForm {
   fullName: string;
@@ -49,6 +50,18 @@ export default function CheckoutPage() {
     state: 'Tamil Nadu',
     pincode: '',
   });
+
+  useEffect(() => {
+    async function checkAuth() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Please sign in to checkout');
+        window.location.href = '/auth/login?redirect=/checkout';
+      }
+    }
+    checkAuth();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setAddress((prev) => ({ ...prev, [e.target.name]: e.target.value }));

@@ -6,6 +6,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Product, ProductVariant } from '@/types';
 import { createClient } from '@/lib/supabase/client';
+import toast from 'react-hot-toast';
 
 export interface CartStoreItem {
   product_id: string;
@@ -43,6 +44,17 @@ export const useCartStore = create<CartStore>()(
       isOpen: false,
 
       addItem: async (product, variant = null, quantity = 1) => {
+        // Auth check first
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          toast.error('Please sign in to add items to your cart');
+          if (typeof window !== 'undefined') {
+            window.location.href = '/auth/login?redirect=/shop';
+          }
+          return;
+        }
+
         // 1. Optimistic UI update
         let isNewItem = true;
         set((state) => {
@@ -68,10 +80,6 @@ export const useCartStore = create<CartStore>()(
 
         // 2. Background Sync
         try {
-          const supabase = createClient();
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) return;
-
           if (isNewItem) {
             await supabase.from('cart_items').insert({
               user_id: user.id,

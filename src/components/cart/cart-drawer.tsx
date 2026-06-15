@@ -49,11 +49,21 @@ export default function CartDrawer() {
     ? Math.min(100, (subtotal / SHIPPING_CONFIG.freeThreshold) * 100)
     : 100;
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (items.length === 0) {
       toast.error('Your cart is empty');
       return;
     }
+
+    const supabase = (await import('@/lib/supabase/client')).createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error('Please sign in to proceed to checkout');
+      closeCart();
+      window.location.href = '/auth/login?redirect=/checkout';
+      return;
+    }
+
     closeCart();
     window.location.href = '/checkout';
   };
