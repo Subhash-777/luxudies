@@ -1,5 +1,5 @@
 -- ===========================================
--- LUXUDIES - Supabase Database Schema
+-- LUXUDIES - Supabase Database Schema (Master)
 -- ===========================================
 -- Run this in Supabase SQL Editor (Dashboard → SQL Editor → New query)
 -- Execute all statements in order.
@@ -162,13 +162,13 @@ CREATE TABLE IF NOT EXISTS public.orders (
   order_number TEXT NOT NULL UNIQUE,
   user_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
   
-  -- Customer info (stored separately so guest checkout works)
+  -- Customer info
   customer_name TEXT NOT NULL,
   customer_email TEXT NOT NULL,
   customer_phone TEXT NOT NULL,
   customer_alternate_phone TEXT,
   
-  -- Shipping address (snapshot at time of order)
+  -- Shipping address
   shipping_line1 TEXT NOT NULL,
   shipping_line2 TEXT,
   shipping_city TEXT NOT NULL,
@@ -398,17 +398,34 @@ CREATE POLICY "Users can remove from cart" ON public.cart_items FOR DELETE USING
 -- Users can submit reviews
 CREATE POLICY "Users can create reviews" ON public.reviews FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- ---- ADMIN policies (full access via service role key) ----
--- Admins use supabase service_role key which bypasses RLS.
--- Alternatively, add admin policies like:
+-- ---- ADMIN policies ----
 
-CREATE POLICY "Admins can do all on users" ON public.users FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')
-);
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.users 
+    WHERE id = auth.uid() AND role = 'admin'
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE POLICY "Admins can do all on users" ON public.users FOR ALL USING (public.is_admin());
+CREATE POLICY "Admins can do all on categories" ON public.categories FOR ALL USING (public.is_admin());
+CREATE POLICY "Admins can do all on products" ON public.products FOR ALL USING (public.is_admin());
+CREATE POLICY "Admins can do all on product images" ON public.product_images FOR ALL USING (public.is_admin());
+CREATE POLICY "Admins can do all on product variants" ON public.product_variants FOR ALL USING (public.is_admin());
+CREATE POLICY "Admins can do all on combos" ON public.combos FOR ALL USING (public.is_admin());
+CREATE POLICY "Admins can do all on combo items" ON public.combo_items FOR ALL USING (public.is_admin());
+CREATE POLICY "Admins can do all on banners" ON public.banners FOR ALL USING (public.is_admin());
+CREATE POLICY "Admins can do all on orders" ON public.orders FOR ALL USING (public.is_admin());
+CREATE POLICY "Admins can do all on order items" ON public.order_items FOR ALL USING (public.is_admin());
+CREATE POLICY "Admins can do all on order history" ON public.order_status_history FOR ALL USING (public.is_admin());
+CREATE POLICY "Admins can do all on reviews" ON public.reviews FOR ALL USING (public.is_admin());
 
 
 -- ============================================
--- 16. INDEXES FOR PERFORMANCE
+-- 17. INDEXES FOR PERFORMANCE
 -- ============================================
 
 CREATE INDEX IF NOT EXISTS idx_products_category ON public.products(category);
@@ -427,7 +444,7 @@ CREATE INDEX IF NOT EXISTS idx_addresses_user ON public.addresses(user_id);
 
 
 -- ============================================
--- 17. UPDATED_AT AUTO-TRIGGER
+-- 18. UPDATED_AT AUTO-TRIGGER
 -- ============================================
 
 CREATE OR REPLACE FUNCTION public.set_updated_at()
@@ -455,5 +472,5 @@ CREATE TRIGGER set_cart_items_updated_at BEFORE UPDATE ON public.cart_items
 
 
 -- ============================================
--- DONE! Your database schema is ready.
+-- DONE! Your master database schema is ready.
 -- ============================================

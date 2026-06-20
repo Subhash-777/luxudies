@@ -1,5 +1,5 @@
 -- ===========================================
--- LUXUDIES - Supabase Storage Buckets
+-- LUXUDIES - Supabase Storage Master Script
 -- ===========================================
 -- Run this in Supabase SQL Editor AFTER schema.sql
 
@@ -35,6 +35,12 @@ CREATE POLICY "Public can view banners" ON storage.objects
 
 CREATE POLICY "Admins can upload banners" ON storage.objects
   FOR INSERT WITH CHECK (
+    bucket_id = 'banners'
+    AND EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
+  );
+
+CREATE POLICY "Admins can delete banners" ON storage.objects
+  FOR DELETE USING (
     bucket_id = 'banners'
     AND EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'admin')
   );
