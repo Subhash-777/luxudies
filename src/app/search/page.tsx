@@ -1,52 +1,67 @@
-// ============================================
-// LUXUDIES - Search Page
-// ============================================
-
 'use client';
 
-import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, TrendingUp } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Search, Loader2 } from 'lucide-react';
 import Header from '@/components/layout/header';
 import MobileNav from '@/components/layout/mobile-nav';
 import Footer from '@/components/layout/footer';
 import CartDrawer from '@/components/cart/cart-drawer';
-import WhatsAppFAB from '@/components/home/whatsapp-fab';
 import ProductCard from '@/components/product/product-card';
-import { SAMPLE_PRODUCTS } from '@/lib/sample-data';
+import WhatsAppFAB from '@/components/home/whatsapp-fab';
+import { createClient } from '@/lib/supabase/client';
 
-const trendingSearches = ['Necklace', 'Gold Hoops', 'Bracelet', 'Pearl Earrings', 'Gift Set'];
-
-function SearchContent() {
+function SearchResults() {
   const searchParams = useSearchParams();
-  const initialQuery = searchParams.get('q') || '';
-  const [query, setQuery] = useState(initialQuery);
+  const query = searchParams.get('q') || '';
+  
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sync query state when URL changes (e.g. from header search)
   useEffect(() => {
-    const q = searchParams.get('q') || '';
-    if (q) setQuery(q);
-  }, [searchParams]);
+    const fetchProducts = async () => {
+      if (!query.trim()) {
+        setProducts([]);
+        setLoading(false);
+        return;
+      }
+      
+      setLoading(true);
+      const supabase = createClient();
+      
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          images:product_images(*)
+        `)
+        .eq('is_active', true)
+        .or(`name.ilike.%${query}%,description.ilike.%${query}%,category.ilike.%${query}%`);
 
-  const results = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase();
-    return SAMPLE_PRODUCTS.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.short_description.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q)
-    );
+      if (data && !error) {
+        // Sort images so primary comes first
+        const formattedData = data.map(p => {
+          if (p.images) {
+            p.images.sort((a: any, b: any) => {
+              if (a.is_primary) return -1;
+              if (b.is_primary) return 1;
+              return a.sort_order - b.sort_order;
+            });
+          }
+          return p;
+        });
+        setProducts(formattedData);
+      } else {
+        setProducts([]);
+      }
+      setLoading(false);
+    };
+
+    fetchProducts();
   }, [query]);
 
   return (
-    <div className="container-luxury py-6 lg:py-10">
-      {/* Search Input */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl mx-auto mb-10"
     <>
       <div className="text-center mb-12 sm:mb-16">
         <motion.div
