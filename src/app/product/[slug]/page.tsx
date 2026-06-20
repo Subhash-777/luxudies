@@ -221,7 +221,7 @@ export default function ProductDetailPage() {
               {/* Thumbnails */}
               {product.images.length > 1 && (
                 <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 snap-x">
-                  {product.images.map((img, i) => (
+                  {product.images.map((img: any, i: number) => (
                     <button
                       key={img.id}
                       onClick={() => setSelectedImageIndex(i)}
