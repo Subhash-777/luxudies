@@ -30,7 +30,8 @@ export default function NewArrivalsPage() {
           images:product_images(*)
         `)
         .eq('is_active', true)
-        .eq('is_new', true);
+        .order('created_at', { ascending: false })
+        .limit(12);
 
       if (data && !error) {
         // Sort images so primary comes first

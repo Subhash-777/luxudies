@@ -22,8 +22,8 @@ export default function NewArrivals() {
           images:product_images(*)
         `)
         .eq('is_active', true)
-        .eq('is_new', true)
-        .limit(4);
+        .order('created_at', { ascending: false })
+        .limit(8);
 
       if (data && !error) {
         // Sort images so primary comes first
