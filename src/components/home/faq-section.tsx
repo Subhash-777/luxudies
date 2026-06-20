@@ -7,7 +7,50 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus } from 'lucide-react';
-import { FAQ_DATA } from '@/lib/sample-data';
+import { cn } from '@/lib/utils';
+
+const FAQ_DATA = [
+  {
+    id: 'faq_1',
+    question: 'Is LUXUDIES jewelry real gold?',
+    answer: 'Our jewelry is 18K gold-plated over high-quality brass, offering the luxurious look and feel of real gold at an accessible price. Each piece is coated with anti-tarnish protection for long-lasting shine.',
+  },
+  {
+    id: 'faq_2',
+    question: 'Is it safe for sensitive skin?',
+    answer: 'Absolutely. All LUXUDIES pieces are hypoallergenic, nickel-free, and lead-free. They are designed to be gentle on even the most sensitive skin.',
+  },
+  {
+    id: 'faq_3',
+    question: 'Can I wear it in water?',
+    answer: 'Our jewelry is water and sweat resistant, perfect for everyday wear. However, we recommend removing your pieces before swimming in chlorinated pools or applying chemicals.',
+  },
+  {
+    id: 'faq_4',
+    question: 'How long will the gold color last?',
+    answer: 'With our anti-tarnish coating, your jewelry will maintain its golden shine for a long time. Following our care instructions will help preserve its beauty even longer.',
+  },
+  {
+    id: 'faq_5',
+    question: 'What is your shipping policy?',
+    answer: 'We offer FREE shipping across Tamil Nadu on all orders. Orders are typically delivered within 3-7 business days. You\'ll receive tracking details once your order is shipped.',
+  },
+  {
+    id: 'faq_6',
+    question: 'What is your return policy?',
+    answer: 'We offer a 7-day return policy. If you\'re not satisfied with your purchase, contact us within 7 days of delivery for a hassle-free return or exchange.',
+  },
+  {
+    id: 'faq_7',
+    question: 'Do you offer gift packaging?',
+    answer: 'Yes! Every LUXUDIES piece comes in premium gift-ready packaging with a velvet pouch and branded box. Perfect for gifting without any extra effort.',
+  },
+  {
+    id: 'faq_8',
+    question: 'How can I track my order?',
+    answer: 'Once your order is shipped, you\'ll receive an SMS and email with your tracking link. You can also track your order anytime on our Track Order page.',
+  },
+];
 
 export default function FAQSection() {
   const faqs = FAQ_DATA.slice(0, 5);

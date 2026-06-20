@@ -19,6 +19,9 @@ import {
   ChevronRight,
   ShieldCheck,
   Loader2,
+  Truck,
+  Shield,
+  ArrowLeft,
 } from 'lucide-react';
 import Header from '@/components/layout/header';
 import MobileNav from '@/components/layout/mobile-nav';
@@ -28,7 +31,6 @@ import WhatsAppFAB from '@/components/home/whatsapp-fab';
 import ProductCard from '@/components/product/product-card';
 import { useCartStore } from '@/store/cart-store';
 import { useWishlistStore } from '@/store/wishlist-store';
-import { SAMPLE_REVIEWS } from '@/lib/sample-data';
 import { cn, formatPrice, getDiscountPercent } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
@@ -38,6 +40,7 @@ export default function ProductDetailPage() {
   const slug = params.slug as string;
   
   const [product, setProduct] = useState<any>(null);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -51,7 +54,7 @@ export default function ProductDetailPage() {
   );
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchProductAndReviews = async () => {
       setLoading(true);
       const supabase = createClient();
       const { data, error } = await supabase
@@ -75,12 +78,22 @@ export default function ProductDetailPage() {
           data.images = [];
         }
         setProduct(data);
+
+        // Fetch reviews
+        const { data: rData } = await supabase
+          .from('reviews')
+          .select('*')
+          .eq('product_id', data.id)
+          .eq('is_approved', true)
+          .order('created_at', { ascending: false });
+          
+        if (rData) setReviews(rData);
       }
       setLoading(false);
     };
 
     if (slug) {
-      fetchProduct();
+      fetchProductAndReviews();
     }
   }, [slug]);
 
@@ -133,9 +146,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  const topReviews = SAMPLE_REVIEWS.filter(
-    (r) => r.product_id === product.id
-  ).slice(0, 2);
+  const topReviews = reviews.slice(0, 3);
 
   const handleAddToCart = () => {
     addItem(product, null, quantity);
