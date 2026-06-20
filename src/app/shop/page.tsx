@@ -4,16 +4,16 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { SlidersHorizontal, ChevronDown, X, Search } from 'lucide-react';
+import { SlidersHorizontal, ChevronDown, X, Search, Loader2 } from 'lucide-react';
 import Header from '@/components/layout/header';
 import MobileNav from '@/components/layout/mobile-nav';
 import Footer from '@/components/layout/footer';
 import CartDrawer from '@/components/cart/cart-drawer';
 import WhatsAppFAB from '@/components/home/whatsapp-fab';
 import ProductCard from '@/components/product/product-card';
-import { SAMPLE_PRODUCTS } from '@/lib/sample-data';
+import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 
 const categories = [
@@ -22,6 +22,7 @@ const categories = [
   { value: 'earrings', label: 'Earrings' },
   { value: 'bracelets', label: 'Bracelets' },
   { value: 'rings', label: 'Rings' },
+  { value: 'combos', label: 'Combos' },
 ];
 
 const sortOptions = [
@@ -36,23 +37,56 @@ export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          images:product_images(*)
+        `)
+        .eq('is_active', true);
+        
+      if (data && !error) {
+        // Sort images so primary comes first
+        const formattedData = data.map(p => {
+          if (p.images) {
+            p.images.sort((a: any, b: any) => {
+              if (a.is_primary) return -1;
+              if (b.is_primary) return 1;
+              return a.sort_order - b.sort_order;
+            });
+          }
+          return p;
+        });
+        setProducts(formattedData);
+      }
+      setLoading(false);
+    };
+
+    fetchProducts();
+  }, []);
 
   const filteredProducts = useMemo(() => {
-    let products = [...SAMPLE_PRODUCTS];
+    let result = [...products];
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      products = products.filter((p) => p.category === selectedCategory);
+      result = result.filter((p) => p.category.toLowerCase() === selectedCategory.toLowerCase());
     }
 
     // Search
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      products = products.filter(
+      result = result.filter(
         (p) =>
           p.name.toLowerCase().includes(query) ||
-          p.short_description.toLowerCase().includes(query) ||
+          (p.short_description && p.short_description.toLowerCase().includes(query)) ||
           p.category.toLowerCase().includes(query)
       );
     }
@@ -60,23 +94,23 @@ export default function ShopPage() {
     // Sort
     switch (sortBy) {
       case 'newest':
-        products.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         break;
       case 'price-low':
-        products.sort((a, b) => a.price - b.price);
+        result.sort((a, b) => a.price - b.price);
         break;
       case 'price-high':
-        products.sort((a, b) => b.price - a.price);
+        result.sort((a, b) => b.price - a.price);
         break;
       case 'bestselling':
-        products.sort((a, b) => (b.is_bestseller ? 1 : 0) - (a.is_bestseller ? 1 : 0));
+        result.sort((a, b) => (b.is_bestseller ? 1 : 0) - (a.is_bestseller ? 1 : 0));
         break;
       default:
-        products.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
+        result.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
     }
 
-    return products;
-  }, [selectedCategory, sortBy, searchQuery]);
+    return result;
+  }, [products, selectedCategory, sortBy, searchQuery]);
 
   return (
     <>
@@ -162,7 +196,12 @@ export default function ShopPage() {
           </p>
 
           {/* Products Grid */}
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-gold-500 mb-4" />
+              <p className="font-inter text-sm text-espresso-200">Loading collection...</p>
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
               {filteredProducts.map((product, i) => (
                 <ProductCard key={product.id} product={product} index={i} />

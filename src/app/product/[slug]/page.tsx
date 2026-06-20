@@ -18,6 +18,7 @@ import {
   Star,
   ChevronRight,
   ShieldCheck,
+  Loader2,
 } from 'lucide-react';
 import Header from '@/components/layout/header';
 import MobileNav from '@/components/layout/mobile-nav';
@@ -27,14 +28,17 @@ import WhatsAppFAB from '@/components/home/whatsapp-fab';
 import ProductCard from '@/components/product/product-card';
 import { useCartStore } from '@/store/cart-store';
 import { useWishlistStore } from '@/store/wishlist-store';
-import { SAMPLE_PRODUCTS, SAMPLE_REVIEWS } from '@/lib/sample-data';
+import { SAMPLE_REVIEWS } from '@/lib/sample-data';
 import { cn, formatPrice, getDiscountPercent } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 
 export default function ProductDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const product = SAMPLE_PRODUCTS.find((p) => p.slug === slug);
+  
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showStickyCart, setShowStickyCart] = useState(false);
@@ -47,9 +51,42 @@ export default function ProductDetailPage() {
   );
 
   useEffect(() => {
+    const fetchProduct = async () => {
+      setLoading(true);
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          images:product_images(*)
+        `)
+        .eq('slug', slug)
+        .eq('is_active', true)
+        .single();
+        
+      if (data && !error) {
+        if (data.images) {
+          data.images.sort((a: any, b: any) => {
+            if (a.is_primary) return -1;
+            if (b.is_primary) return 1;
+            return a.sort_order - b.sort_order;
+          });
+        } else {
+          data.images = [];
+        }
+        setProduct(data);
+      }
+      setLoading(false);
+    };
+
+    if (slug) {
+      fetchProduct();
+    }
+  }, [slug]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Show sticky cart when main CTA is out of view (above viewport)
         setShowStickyCart(!entry.isIntersecting && entry.boundingClientRect.top < 0);
       },
       { threshold: 0 }
@@ -60,7 +97,22 @@ export default function ProductDetailPage() {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [loading, product]);
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <main className="min-h-screen flex items-center justify-center bg-pearl">
+          <div className="flex flex-col items-center">
+            <Loader2 className="w-10 h-10 animate-spin text-gold-500 mb-4" />
+            <p className="font-playfair text-xl text-espresso">Loading product...</p>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   if (!product) {
     return (
@@ -80,10 +132,6 @@ export default function ProductDetailPage() {
       </>
     );
   }
-
-  const relatedProducts = SAMPLE_PRODUCTS.filter(
-    (p) => p.id !== product.id && p.category === product.category
-  ).slice(0, 4);
 
   const topReviews = SAMPLE_REVIEWS.filter(
     (r) => r.product_id === product.id
