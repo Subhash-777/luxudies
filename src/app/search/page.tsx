@@ -47,79 +47,64 @@ function SearchContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-2xl mx-auto mb-10"
-      >
-        <div className="relative">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-espresso-200" />
-          <input
-            type="text"
-            placeholder="Search for necklaces, earrings, bracelets..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            autoFocus
-            className="w-full h-14 pl-14 pr-12 bg-white/60 backdrop-blur-sm border border-gold-400/15 rounded-2xl text-base font-inter text-espresso placeholder:text-espresso-100 focus:outline-none focus:border-gold-400/40 focus:ring-2 focus:ring-gold-400/10 transition-all"
-          />
-          {query && (
-            <button
-              onClick={() => setQuery('')}
-              className="absolute right-5 top-1/2 -translate-y-1/2 text-espresso-200 hover:text-espresso"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          )}
+    <>
+      <div className="text-center mb-12 sm:mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ivory border border-gold-400/20 mb-6"
+        >
+          <Search className="w-4 h-4 text-gold-500" />
+          <span className="font-inter text-xs font-bold text-gold-600 tracking-widest uppercase">
+            Search Results
+          </span>
+        </motion.div>
+        
+        <motion.h1 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="font-playfair text-3xl sm:text-4xl lg:text-5xl font-bold text-espresso mb-4"
+        >
+          {query ? `Results for "${query}"` : 'Search Our Store'}
+        </motion.h1>
+        
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="font-inter text-sm sm:text-base text-espresso-200 max-w-2xl mx-auto"
+        >
+          {loading 
+            ? 'Searching our collection...'
+            : products.length > 0 
+              ? `Found ${products.length} product${products.length === 1 ? '' : 's'} matching your search.` 
+              : 'No products matched your search criteria.'}
+        </motion.p>
+      </div>
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-gold-500 mb-4" />
+          <p className="font-inter text-sm text-espresso-200">Searching...</p>
         </div>
-      </motion.div>
-
-      {/* Trending Searches (when no query) */}
-      <AnimatePresence>
-        {!query && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="max-w-2xl mx-auto text-center"
-          >
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <TrendingUp className="w-4 h-4 text-gold-500" />
-              <span className="text-xs font-inter font-semibold text-espresso-200 uppercase tracking-widest">Trending Searches</span>
-            </div>
-            <div className="flex flex-wrap justify-center gap-2">
-              {trendingSearches.map((term) => (
-                <button
-                  key={term}
-                  onClick={() => setQuery(term)}
-                  className="px-4 py-2 bg-pearl-200 hover:bg-pearl-300 text-sm font-inter text-espresso-300 rounded-full transition-colors"
-                >
-                  {term}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Results */}
-      {query && (
-        <div>
-          <p className="text-xs font-inter text-espresso-200 mb-4">
-            {results.length} {results.length === 1 ? 'result' : 'results'} for &ldquo;{query}&rdquo;
+      ) : products.length > 0 ? (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+          {products.map((product, i) => (
+            <ProductCard key={product.id} product={product} index={i} />
+          ))}
+        </div>
+      ) : query ? (
+        <div className="text-center py-20">
+          <p className="font-playfair text-xl text-espresso mb-2">
+            No products found
           </p>
-          {results.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
-              {results.map((product, i) => (
-                <ProductCard key={product.id} product={product} index={i} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <p className="font-playfair text-xl text-espresso mb-2">No results found</p>
-              <p className="font-inter text-sm text-espresso-200">
-                Try a different search term or browse our collections.
-              </p>
-            </div>
-          )}
+          <p className="font-inter text-sm text-espresso-200">
+            Try checking your spelling or using different keywords.
+          </p>
         </div>
-      )}
-    </div>
+      ) : null}
+    </>
   );
 }
 
@@ -127,14 +112,16 @@ export default function SearchPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen">
-        <Suspense fallback={
-          <div className="container-luxury py-6 lg:py-10 text-center">
-            <p className="font-inter text-sm text-espresso-200">Loading search...</p>
-          </div>
-        }>
-          <SearchContent />
-        </Suspense>
+      <main className="min-h-screen bg-pearl pb-24 lg:pb-0">
+        <div className="container-luxury py-8 lg:py-12">
+          <Suspense fallback={
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-gold-500 mb-4" />
+            </div>
+          }>
+            <SearchResults />
+          </Suspense>
+        </div>
       </main>
       <Footer />
       <CartDrawer />
