@@ -29,7 +29,7 @@ export default function ProductCard({
   const addItem = useCartStore((s) => s.addItem);
   const toggleWishlist = useWishlistStore((s) => s.toggleItem);
   const isWishlisted = useWishlistStore((s) => s.isInWishlist(product.id));
-  const primaryImage = product.images.find((img) => img.is_primary) || product.images[0];
+  const primaryImage = product.images?.find((img: any) => img.is_primary) || product.images?.[0];
   const discount = product.compare_at_price
     ? getDiscountPercent(product.price, product.compare_at_price)
     : 0;
