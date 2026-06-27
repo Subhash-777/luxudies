@@ -137,7 +137,7 @@ export default function OrdersPage() {
                   {order.order_items.map((item: any, j: number) => (
                     <div key={j} className="flex items-center gap-4 p-3 hover:bg-white/40 transition-colors rounded-xl">
                       <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-pearl-100 shrink-0 border border-gold-400/10 shadow-sm">
-                        <Image src={item.product_image || '/images/products/placeholder.jpg'} alt={item.product_name} fill className="object-cover" sizes="64px" />
+                        <Image src={item.product_image || '/images/brand/logo.jpg'} alt={item.product_name} fill className="object-cover" sizes="64px" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-playfair text-sm font-semibold text-espresso line-clamp-1 mb-1">{item.product_name}</p>

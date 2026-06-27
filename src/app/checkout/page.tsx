@@ -298,7 +298,7 @@ export default function CheckoutPage() {
                     return (
                       <div key={`${item.product.id}-${item.variant_id}`} className="flex gap-4">
                         <div className="relative w-16 h-20 rounded-xl overflow-hidden bg-pearl-100 flex-shrink-0 border border-gold-400/10">
-                          <Image src={img?.url || '/images/placeholder.jpg'} alt={item.product.name} fill className="object-cover" sizes="64px" />
+                          <Image src={img?.url || '/images/brand/logo.jpg'} alt={item.product.name} fill className="object-cover" sizes="64px" />
                           <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-antique text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm">
                             {item.quantity}
                           </span>

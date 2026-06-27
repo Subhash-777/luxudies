@@ -196,7 +196,7 @@ export default function ProductDetailPage() {
                     className="absolute inset-0"
                   >
                     <Image
-                      src={product.images?.[selectedImageIndex]?.url || product.images?.[0]?.url || '/images/placeholder.jpg'}
+                      src={product.images?.[selectedImageIndex]?.url || product.images?.[0]?.url || '/images/brand/logo.jpg'}
                       alt={product.name}
                       fill
                       className="object-contain sm:object-cover scale-100 group-hover:scale-105 transition-transform duration-700 origin-center"
@@ -359,7 +359,7 @@ export default function ProductDetailPage() {
             <div className="max-w-4xl mx-auto glass-card p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
               <div className="flex items-center gap-4">
                 <div className="w-24 h-24 rounded-full overflow-hidden relative shadow-soft">
-                  <Image src={product.images?.[0]?.url || '/images/placeholder.jpg'} alt="" fill className="object-cover" />
+                  <Image src={product.images?.[0]?.url || '/images/brand/logo.jpg'} alt="" fill className="object-cover" />
                 </div>
                 <Plus className="w-6 h-6 text-gold-400" />
                 <div className="w-24 h-24 rounded-full overflow-hidden relative shadow-soft">
