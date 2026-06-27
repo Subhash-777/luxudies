@@ -44,10 +44,7 @@ export default function CartDrawer() {
   if (!mounted) return null;
 
   const subtotal = getSubtotal();
-  const amountToFreeShipping = Math.max(0, SHIPPING_CONFIG.freeThreshold - subtotal);
-  const progressPercentage = SHIPPING_CONFIG.freeThreshold > 0 
-    ? Math.min(100, (subtotal / SHIPPING_CONFIG.freeThreshold) * 100)
-    : 100;
+
 
   const handleCheckout = async () => {
     if (items.length === 0) {
@@ -107,23 +104,11 @@ export default function CartDrawer() {
               </button>
             </div>
 
-            {/* Free Shipping Progress */}
-            <div className="flex-shrink-0 p-6 bg-ivory-50/50 border-b border-gold-400/10">
-              <p className="font-inter text-sm text-espresso-300 mb-3 text-center">
-                {amountToFreeShipping > 0 ? (
-                  <>Add <span className="font-bold text-gold-600">{formatPrice(amountToFreeShipping)}</span> more to unlock Free Shipping</>
-                ) : (
-                  <span className="font-bold text-gold-600">Congratulations! You've unlocked Free Shipping.</span>
-                )}
+            {/* Free Shipping Message */}
+            <div className="flex-shrink-0 p-4 bg-ivory-50/50 border-b border-gold-400/10 text-center">
+              <p className="font-inter text-sm text-espresso-300">
+                <span className="font-bold text-gold-600">Free Delivery</span> across Tamil Nadu. ₹99 for other states.
               </p>
-              <div className="h-1.5 w-full bg-gold-400/20 rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progressPercentage}%` }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="h-full bg-gold-500 rounded-full"
-                />
-              </div>
             </div>
 
             {/* Cart Items — scrollable area */}

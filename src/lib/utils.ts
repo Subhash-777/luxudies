@@ -155,5 +155,4 @@ export const PRODUCT_BENEFITS = [
   { key: 'water-resistant', label: 'Water & Sweat Resistant', description: 'Worry-free wear', icon: 'Droplets' },
   { key: 'gift-ready', label: 'Gift-Ready', description: 'Premium packaging', icon: 'Gift' },
   { key: 'hypoallergenic', label: 'Hypoallergenic', description: 'Nickel & lead free', icon: 'Heart' },
-  { key: '18k-gold', label: '18K Gold Plated', description: 'Luxurious gold shine', icon: 'Sparkles' },
 ] as const;

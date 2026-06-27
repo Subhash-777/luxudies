@@ -12,7 +12,7 @@ export default function TrustSection() {
     {
       icon: ShieldCheck,
       title: "Anti-Tarnish",
-      description: "18K gold plated to resist fading and wear."
+      description: "Coated with anti-tarnish protection for lasting shine."
     },
     {
       icon: Feather,

@@ -112,7 +112,7 @@ export default function CollectionsSection() {
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
             >
-              <Link href={`/shop/${collection.slug}`} className="group block h-full">
+              <Link href={`/shop?category=${collection.slug}`} className="group block h-full">
                 <div className="glass-card overflow-hidden h-[360px] lg:h-[420px] relative transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-medium group-hover:border-gold-400/30">
                   <div className="absolute inset-0 bg-pearl-100">
                     <Image

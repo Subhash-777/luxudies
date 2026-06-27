@@ -6,9 +6,9 @@
 
 export default function AnnouncementBar() {
   const announcements = [
-    "Free shipping on orders above ₹999",
+    "Free Delivery Across Tamil Nadu • ₹99 for Other States",
     "Extra 10% off on your first order — Use code LUXE10",
-    "18K Gold Plated • Anti-Tarnish • Premium Quality"
+    "Anti-Tarnish • Lightweight • Premium Quality"
   ];
 
   return (

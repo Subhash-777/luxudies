@@ -18,7 +18,7 @@ import Button from '@/components/ui/button';
 
 const values = [
   { icon: Heart, title: 'Crafted with Love', desc: 'Every piece is designed with passion and attention to detail.' },
-  { icon: Sparkles, title: 'Premium Quality', desc: '18K gold plating with anti-tarnish protection for lasting beauty.' },
+  { icon: Sparkles, title: 'Premium Quality', desc: 'Anti-tarnish coating with premium finish for lasting beauty.' },
   { icon: Shield, title: 'Customer First', desc: 'Your satisfaction is our top priority. Always.' },
   { icon: Users, title: 'Community', desc: 'Building a family of women who celebrate everyday elegance.' },
 ];
@@ -93,7 +93,7 @@ export default function AboutPage() {
                 </p>
                 <p className="font-inter text-sm text-espresso-200 leading-relaxed">
                   Each LUXUDIES piece undergoes a meticulous process — from design conceptualization to
-                  18K gold plating, anti-tarnish coating, and quality testing. We ensure every piece that
+                  premium finishing, anti-tarnish coating, and quality testing. We ensure every piece that
                   reaches you is nothing short of perfect.
                 </p>
                 <p className="font-inter text-sm text-espresso-200 leading-relaxed">

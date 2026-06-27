@@ -1,15 +1,15 @@
 // ============================================
-// LUXUDIES - Razorpay Create Order API
+// LUXUDIES - Paytm Initiate Transaction API
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getRazorpay } from '@/lib/razorpay';
+import { getPaytmConfig, getPaytmHost, generateChecksum } from '@/lib/paytm';
 import { generateOrderNumber } from '@/lib/utils';
 import { createAdminClient, createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const razorpay = getRazorpay();
+    const config = getPaytmConfig();
     const body = await request.json();
     const { items, address } = body;
 
@@ -66,25 +66,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Shipping is free across Tamil Nadu
-    const trueShippingCost = 0; 
+    // Shipping calculation based on State
+    const trueShippingCost = address.state?.trim().toLowerCase() === 'tamil nadu' ? 0 : 99; 
     const trueTotal = trueSubtotal + trueShippingCost;
 
     const orderNumber = generateOrderNumber();
-
-    const order = await razorpay.orders.create({
-      amount: Math.round(trueTotal * 100), // Convert to paise
-      currency: 'INR',
-      receipt: orderNumber,
-      notes: {
-        order_number: orderNumber,
-        customer_name: address.fullName,
-        customer_email: address.email,
-        customer_phone: address.phone,
-        items_count: items.length.toString(),
-      },
-    });
-
+    const customerId = user?.id || `GUEST_${Date.now()}`;
+    
+    // Base URL for callback
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
+                   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+    
     // Save pending order to database
     const { data: newOrder, error: orderError } = await supabaseAdmin.from('orders').insert({
       order_number: orderNumber,
@@ -102,9 +94,10 @@ export async function POST(request: NextRequest) {
       shipping_cost: trueShippingCost,
       discount: 0,
       total: trueTotal,
-      payment_method: 'razorpay',
+      payment_method: 'paytm',
       payment_status: 'pending',
-      razorpay_order_id: order.id,
+      razorpay_order_id: null, // Keep column for legacy but set to null
+      paytm_order_id: orderNumber, // Can just use order number
       status: 'pending'
     }).select('id').single();
 
@@ -130,14 +123,61 @@ export async function POST(request: NextRequest) {
       throw new Error(`Failed to save order items: ${itemsError.message}`);
     }
 
-    return NextResponse.json({
-      orderId: order.id,
-      orderNumber,
-      amount: order.amount,
-      currency: order.currency,
+    // ----------------------------------------------------
+    // PAYTM Initiate Transaction
+    // ----------------------------------------------------
+    const paytmParams = {
+      body: {
+        requestType: "Payment",
+        mid: config.mid,
+        websiteName: config.website,
+        orderId: orderNumber,
+        callbackUrl: `${baseUrl}/api/paytm/callback`,
+        txnAmount: {
+          value: String(trueTotal),
+          currency: "INR",
+        },
+        userInfo: {
+          custId: customerId,
+        },
+      }
+    };
+
+    const checksum = await generateChecksum(paytmParams.body, config.merchantKey);
+    const postData = JSON.stringify({
+      ...paytmParams,
+      head: {
+        signature: checksum
+      }
     });
+
+    const paytmHost = getPaytmHost(config);
+    const apiUrl = `https://${paytmHost}/theia/api/v1/initiateTransaction?mid=${config.mid}&orderId=${orderNumber}`;
+
+    const paytmRes = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': postData.length.toString()
+      },
+      body: postData
+    });
+
+    const paytmData = await paytmRes.json();
+    
+    if (paytmData.body.resultInfo.resultStatus === 'S') {
+      return NextResponse.json({
+        txnToken: paytmData.body.txnToken,
+        orderId: orderNumber,
+        amount: trueTotal,
+      });
+    } else {
+      console.error('Paytm Initiate Error:', paytmData);
+      throw new Error(paytmData.body.resultInfo.resultMsg || 'Paytm API failed');
+    }
+    
   } catch (error) {
-    console.error('Error creating Razorpay order:', error);
+    console.error('Error creating Paytm order:', error);
     return NextResponse.json(
       { error: 'Failed to create order' },
       { status: 500 }

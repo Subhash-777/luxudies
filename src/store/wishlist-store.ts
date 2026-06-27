@@ -104,7 +104,10 @@ export const useWishlistStore = create<WishlistStore>()(
 
           const { data: dbWishlists, error } = await supabase
             .from('wishlists')
-            .select(`product:products(*)`)
+            .select(`product:products(
+              *,
+              images:product_images(*)
+            )`)
             .eq('user_id', user.id);
             
           if (error || !dbWishlists) return;

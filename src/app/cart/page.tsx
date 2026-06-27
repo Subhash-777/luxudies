@@ -230,7 +230,7 @@ export default function CartPage() {
                 <div className="flex items-center justify-center gap-2 mt-4">
                   <Shield className="w-3.5 h-3.5 text-gold-400" />
                   <span className="text-[10px] font-inter text-espresso-200">
-                    Secure checkout powered by Razorpay
+                    Secure checkout powered by Paytm
                   </span>
                 </div>
               </GlassCard>

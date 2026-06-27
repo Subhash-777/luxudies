@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     template: '%s | LUXUDIES',
   },
   description:
-    'Discover premium 18K gold-plated jewelry crafted with elegance. Anti-tarnish, lightweight, and gift-ready. Free shipping across Tamil Nadu.',
+    'Discover premium fashion jewelry crafted with elegance. Anti-tarnish, lightweight, and gift-ready. Free delivery across Tamil Nadu.',
   keywords: [
     'luxury jewelry',
     'gold plated jewelry',
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     siteName: 'LUXUDIES',
     title: 'LUXUDIES — Luxury Jewellery You Deserve',
     description:
-      'Crafted to be cherished. Designed to be you. Premium 18K gold-plated jewelry with free shipping across Tamil Nadu.',
+      'Crafted to be cherished. Designed to be you. Premium fashion jewelry with free delivery across Tamil Nadu.',
     images: [
       {
         url: '/images/brand/logo.jpg',
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'LUXUDIES — Luxury Jewellery You Deserve',
     description:
-      'Premium 18K gold-plated jewelry. Anti-tarnish, lightweight, gift-ready.',
+      'Premium fashion jewelry. Anti-tarnish, lightweight, gift-ready.',
     images: ['/images/brand/logo.jpg'],
   },
   robots: {
@@ -99,8 +99,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`scroll-smooth ${playfair.variable} ${inter.variable}`} data-scroll-behavior="smooth">
       <head>
-        {/* Razorpay Script - loaded early for fast checkout */}
-        <script src="https://checkout.razorpay.com/v1/checkout.js" async />
+        {/* Paytm Checkout JS - loaded dynamically at checkout */}
       </head>
       <body className="bg-pearl text-espresso font-inter antialiased">
         <StoreInitializer />

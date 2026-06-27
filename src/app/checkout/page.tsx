@@ -61,6 +61,16 @@ export default function CheckoutPage() {
       }
     }
     checkAuth();
+
+    // Load Paytm Checkout JS
+    const mid = process.env.NEXT_PUBLIC_PAYTM_MID;
+    if (mid) {
+      const script = document.createElement('script');
+      const env = process.env.NEXT_PUBLIC_PAYTM_ENVIRONMENT === 'STAGING' ? 'securegw-stage' : 'securegw';
+      script.src = `https://${env}.paytm.in/merchantpgpui/checkoutjs/merchants/${mid}.js`;
+      script.async = true;
+      document.body.appendChild(script);
+    }
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -84,13 +94,10 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
-      const response = await fetch('/api/razorpay/create-order', {
+      const response = await fetch('/api/paytm/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          subtotal: getSubtotal(),
-          shippingCost: 0,
-          total: getTotal(),
           items: items.map((item) => {
             const primaryImage = item.product.images?.find((img: any) => img.is_primary) || item.product.images?.[0];
             return {
@@ -109,58 +116,45 @@ export default function CheckoutPage() {
 
       const data = await response.json();
 
-      if (!data.orderId) {
-        throw new Error('Failed to create order');
+      if (!data.txnToken) {
+        throw new Error(data.error || 'Failed to create order');
       }
 
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: getTotal() * 100,
-        currency: 'INR',
-        name: 'LUXUDIES',
-        description: 'Luxury Jewellery Purchase',
-        image: '/images/brand/logo.jpg',
-        order_id: data.orderId,
-        handler: async function (response: any) {
-          const verifyRes = await fetch('/api/razorpay/verify-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            }),
-          });
-
-          const verifyData = await verifyRes.json();
-
-          if (verifyData.success) {
-            clearCart();
-            window.location.href = `/checkout/success?order=${verifyData.orderNumber}`;
-          } else {
-            toast.error('Payment verification failed. Please contact support.');
+      const config = {
+        root: "",
+        flow: "DEFAULT",
+        data: {
+          orderId: data.orderId,
+          token: data.txnToken,
+          tokenType: "TXN_TOKEN",
+          amount: data.amount
+        },
+        handler: {
+          notifyMerchant: function(eventName: string, data: any) {
+            console.log("Paytm Notify:", eventName, data);
+            if(eventName === 'APP_CLOSED') {
+              setIsProcessing(false);
+              toast.error('Payment cancelled');
+            }
           }
-        },
-        prefill: {
-          name: address.fullName,
-          email: address.email,
-          contact: address.phone,
-        },
-        theme: {
-          color: '#D4AF37',
-          backdrop_color: 'rgba(58, 42, 30, 0.5)',
-        },
-        modal: {
-          ondismiss: function () {
-            setIsProcessing(false);
-            toast.error('Payment cancelled');
-          },
-        },
+        }
       };
 
-      // @ts-expect-error Razorpay is loaded via script
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      // @ts-expect-error Paytm is loaded via script
+      if (window.Paytm && window.Paytm.CheckoutJS) {
+        // @ts-expect-error Paytm is loaded via script
+        window.Paytm.CheckoutJS.init(config).then(function onSuccess() {
+          // @ts-expect-error Paytm is loaded via script
+          window.Paytm.CheckoutJS.invoke();
+        }).catch(function onError(error: any){
+          console.error("Paytm Init Error => ", error);
+          setIsProcessing(false);
+          toast.error("Failed to load payment gateway");
+        });
+      } else {
+        setIsProcessing(false);
+        toast.error("Payment gateway is still loading. Please try again in a few seconds.");
+      }
     } catch (error) {
       console.error('Payment error:', error);
       toast.error('Something went wrong. Please try again.');
@@ -321,11 +315,13 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between text-sm font-inter">
                     <span className="text-espresso-300">Shipping</span>
-                    <span className="font-medium text-antique">FREE</span>
+                    <span className="font-medium text-antique">
+                      {getShipping(address.state) === 0 ? 'FREE' : formatPrice(getShipping(address.state))}
+                    </span>
                   </div>
                   <div className="flex justify-between pt-4 mt-2 border-t border-gold-400/20">
                     <span className="font-inter font-bold text-espresso uppercase tracking-widest">Total</span>
-                    <span className="font-inter font-bold text-2xl text-espresso">{formatPrice(getTotal())}</span>
+                    <span className="font-inter font-bold text-2xl text-espresso">{formatPrice(getTotal(address.state))}</span>
                   </div>
                 </div>
 
@@ -334,7 +330,7 @@ export default function CheckoutPage() {
                   disabled={isProcessing}
                   className="w-full btn-gold h-14 text-sm tracking-widest flex items-center justify-center gap-3 shadow-gold"
                 >
-                  {isProcessing ? 'PROCESSING...' : `PAY ${formatPrice(getTotal())}`}
+                  {isProcessing ? 'PROCESSING...' : `PAY ${formatPrice(getTotal(address.state))}`}
                   {!isProcessing && <CreditCard className="w-5 h-5" />}
                 </button>
 
@@ -342,7 +338,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center gap-2">
                     <Lock className="w-3.5 h-3.5 text-gold-500" />
                     <span className="text-xs font-inter font-medium text-espresso-300">
-                      Secured by Razorpay
+                      Secured by Paytm
                     </span>
                   </div>
                 </div>

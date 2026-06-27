@@ -25,7 +25,7 @@ export default function ComboOffersPage() {
           *,
           images:product_images(*)
         `)
-        .eq('category', 'combos')
+        .ilike('category', 'combos')
         .eq('is_active', true);
 
       if (data && !error) {

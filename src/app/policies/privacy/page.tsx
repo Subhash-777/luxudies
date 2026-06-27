@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
           <p>When you visit our website or make a purchase, we collect:</p>
           <ul className="list-disc pl-5 space-y-1 mt-2">
             <li>Personal information: name, email, phone number, shipping address</li>
-            <li>Payment information (processed securely by Razorpay — we never store card details)</li>
+            <li>Payment information (processed securely by Paytm — we never store card details)</li>
             <li>Browsing data: pages visited, products viewed, device information</li>
           </ul>
         </section>
@@ -37,14 +37,14 @@ export default function PrivacyPolicyPage() {
 
         <section>
           <h2 className="font-playfair text-xl font-semibold text-espresso mb-3">Data Security</h2>
-          <p>We implement industry-standard security measures to protect your personal information. All payment transactions are processed through <strong className="text-espresso">Razorpay</strong>, which is PCI-DSS compliant.</p>
+          <p>We implement industry-standard security measures to protect your personal information. All payment transactions are processed through <strong className="text-espresso">Paytm</strong>, which is PCI-DSS compliant.</p>
         </section>
 
         <section>
           <h2 className="font-playfair text-xl font-semibold text-espresso mb-3">Third-Party Sharing</h2>
           <p>We do not sell or share your personal information with third parties, except:</p>
           <ul className="list-disc pl-5 space-y-1 mt-2">
-            <li>Payment processor (Razorpay) for transaction processing</li>
+            <li>Payment processor (Paytm) for transaction processing</li>
             <li>Shipping partners for order delivery</li>
             <li>Analytics services (anonymized data only)</li>
           </ul>

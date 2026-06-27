@@ -13,7 +13,7 @@ const FAQ_DATA = [
   {
     id: 'faq_1',
     question: 'Is LUXUDIES jewelry real gold?',
-    answer: 'Our jewelry is 18K gold-plated over high-quality brass, offering the luxurious look and feel of real gold at an accessible price. Each piece is coated with anti-tarnish protection for long-lasting shine.',
+    answer: 'No, our jewelry is not real gold. LUXUDIES offers premium fashion jewelry crafted from high-quality materials with an anti-tarnish coating. Each piece is designed to give you a stylish, elegant look perfect for everyday wear — at an accessible price.',
   },
   {
     id: 'faq_2',
@@ -33,7 +33,7 @@ const FAQ_DATA = [
   {
     id: 'faq_5',
     question: 'What is your shipping policy?',
-    answer: 'We offer FREE shipping across Tamil Nadu on all orders. Orders are typically delivered within 3-7 business days. You\'ll receive tracking details once your order is shipped.',
+    answer: 'We offer FREE delivery across Tamil Nadu on all orders. For all other states, a flat delivery charge of ₹99 applies. Orders are typically delivered within 3-7 business days. You\'ll receive tracking details once your order is shipped.',
   },
   {
     id: 'faq_6',

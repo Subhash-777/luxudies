@@ -76,7 +76,7 @@ export default function AdminSettingsPage() {
         <GlassCard variant="strong" padding="lg">
           <div className="flex items-center gap-3 mb-5">
             <CreditCard className="w-5 h-5 text-gold-500" />
-            <h2 className="font-inter font-semibold text-espresso">Payment (Razorpay)</h2>
+            <h2 className="font-inter font-semibold text-espresso">Payment (Paytm)</h2>
           </div>
           <div className="space-y-4">
             <div>

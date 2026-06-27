@@ -89,8 +89,8 @@ export default function HeroSection() {
               transition={{ delay: 1, duration: 0.8 }}
               className="absolute -bottom-4 -left-4 sm:-left-10 bg-white/90 backdrop-blur-md border border-gold-400/20 px-6 py-4 rounded-2xl shadow-xl z-20"
             >
-              <p className="font-playfair font-bold text-espresso text-lg mb-0.5">18K Gold Plated</p>
-              <p className="font-inter text-xs text-espresso-300 tracking-wide uppercase">Handcrafted Elegance</p>
+              <p className="font-playfair font-bold text-espresso text-lg mb-0.5">Premium Anti-Tarnish</p>
+              <p className="font-inter text-xs text-espresso-300 tracking-wide uppercase">Everyday Elegance</p>
             </motion.div>
           </motion.div>
 
@@ -164,7 +164,7 @@ export default function HeroSection() {
                 Secure Checkout
               </span>
               <span className="hidden sm:block w-1 h-1 rounded-full bg-gold-200" />
-              <span>Free shipping above ₹999</span>
+              <span>Free Delivery Across Tamil Nadu</span>
               <span className="hidden sm:block w-1 h-1 rounded-full bg-gold-200" />
               <span>Easy returns</span>
             </motion.div>

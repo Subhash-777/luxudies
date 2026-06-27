@@ -25,7 +25,7 @@ export default function TermsPage() {
             <li>All prices are listed in Indian Rupees (INR) and include applicable taxes.</li>
             <li>We reserve the right to modify prices without prior notice.</li>
             <li>Product images are representative; actual products may have slight variations.</li>
-            <li>Our jewelry is 18K gold-plated, not solid gold.</li>
+            <li>Our jewelry is premium fashion jewelry with anti-tarnish coating, not solid gold.</li>
           </ul>
         </section>
 
@@ -34,7 +34,7 @@ export default function TermsPage() {
           <ul className="list-disc pl-5 space-y-1">
             <li>All orders are subject to availability and confirmation.</li>
             <li>We accept payments via UPI, credit/debit cards, net banking, wallets, and COD.</li>
-            <li>Payment is processed securely through Razorpay.</li>
+            <li>Payment is processed securely through Paytm.</li>
             <li>We reserve the right to cancel orders if fraud is suspected.</li>
           </ul>
         </section>

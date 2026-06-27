@@ -84,7 +84,6 @@ export default function ProductDetailPage() {
           .from('reviews')
           .select('*')
           .eq('product_id', data.id)
-          .eq('is_approved', true)
           .order('created_at', { ascending: false });
           
         if (rData) setReviews(rData);
@@ -146,8 +145,45 @@ export default function ProductDetailPage() {
     );
   }
 
+  const avgRating = reviews.length > 0 
+    ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length).toFixed(1)
+    : "0.0";
+    
   const topReviews = reviews.slice(0, 3);
-
+  
+  const handleReviewSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const rating = Number(formData.get('rating'));
+    const title = formData.get('title');
+    const body = formData.get('body');
+    const name = formData.get('name');
+    
+    if(!rating || rating < 1 || rating > 5) {
+      toast.error('Please select a rating');
+      return;
+    }
+    
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    const { error } = await supabase.from('reviews').insert({
+      product_id: product.id,
+      user_id: user?.id || null,
+      rating,
+      title,
+      content: body,
+      customer_name: name || user?.user_metadata?.full_name || 'Anonymous',
+      is_approved: true // Automatically approved by default
+    });
+    
+    if (error) {
+      toast.error('Failed to submit review');
+    } else {
+      toast.success('Review submitted successfully!');
+      (e.target as HTMLFormElement).reset();
+    }
+  };
   const handleAddToCart = () => {
     addItem(product, null, quantity);
     toast.success(`${product.name} added to cart`);
@@ -288,7 +324,7 @@ export default function ProductDetailPage() {
                     {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
                   </div>
                   <span className="font-inter text-espresso-300 underline cursor-pointer hover:text-gold-500 transition-colors">
-                    4.9 (124 reviews)
+                    {reviews.length > 0 ? `${avgRating} (${reviews.length} reviews)` : 'No reviews yet'}
                   </span>
                 </div>
               </div>
@@ -306,7 +342,7 @@ export default function ProductDetailPage() {
                 </h3>
                 <ul className="space-y-3">
                   {[
-                    "Handcrafted with 18K Gold Plating",
+                    "Handcrafted with Premium Finish",
                     "Anti-tarnish and water-resistant",
                     "Hypoallergenic and gentle on skin",
                     "Arrives in signature luxury packaging"
@@ -386,20 +422,56 @@ export default function ProductDetailPage() {
               <h2 className="font-playfair text-3xl font-bold text-espresso">
                 Customer Reviews
               </h2>
-              <Link href="/reviews" className="hidden sm:flex items-center gap-2 font-inter text-sm text-espresso-300 hover:text-gold-500">
-                See all reviews <ChevronRight className="w-4 h-4" />
-              </Link>
             </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              {topReviews.map(r => (
-                <div key={r.id} className="glass-card p-6">
-                  <div className="flex gap-1 mb-3">
-                    {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-gold-400 text-gold-400" />)}
+            
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* Write Review Form */}
+              <div className="lg:col-span-1 glass-card p-6 h-fit">
+                <h3 className="font-playfair text-xl font-bold text-espresso mb-4">Write a Review</h3>
+                <form onSubmit={handleReviewSubmit} className="space-y-4">
+                  <div>
+                    <label className="block font-inter text-xs font-semibold text-espresso-300 uppercase tracking-widest mb-1.5">Your Name</label>
+                    <input name="name" type="text" required className="w-full bg-transparent border-b border-gold-400/20 pb-2 text-espresso focus:outline-none focus:border-gold-500 font-inter placeholder:text-espresso-200" placeholder="John Doe" />
                   </div>
-                  <p className="font-playfair italic text-lg text-espresso-400 mb-4">"{r.body}"</p>
-                  <p className="font-inter font-bold text-sm text-espresso">{r.user_name}</p>
-                </div>
-              ))}
+                  <div>
+                    <label className="block font-inter text-xs font-semibold text-espresso-300 uppercase tracking-widest mb-1.5">Rating (1-5)</label>
+                    <input name="rating" type="number" min="1" max="5" required className="w-full bg-transparent border-b border-gold-400/20 pb-2 text-espresso focus:outline-none focus:border-gold-500 font-inter placeholder:text-espresso-200" placeholder="5" />
+                  </div>
+                  <div>
+                    <label className="block font-inter text-xs font-semibold text-espresso-300 uppercase tracking-widest mb-1.5">Title</label>
+                    <input name="title" type="text" required className="w-full bg-transparent border-b border-gold-400/20 pb-2 text-espresso focus:outline-none focus:border-gold-500 font-inter placeholder:text-espresso-200" placeholder="Beautiful product!" />
+                  </div>
+                  <div>
+                    <label className="block font-inter text-xs font-semibold text-espresso-300 uppercase tracking-widest mb-1.5">Review</label>
+                    <textarea name="body" required rows={3} className="w-full bg-transparent border-b border-gold-400/20 pb-2 text-espresso focus:outline-none focus:border-gold-500 font-inter placeholder:text-espresso-200 resize-none" placeholder="Tell us what you think..."></textarea>
+                  </div>
+                  <button type="submit" className="w-full btn-ghost-gold px-6 py-3 text-xs">
+                    SUBMIT REVIEW
+                  </button>
+                </form>
+              </div>
+
+              {/* Display Reviews */}
+              <div className="lg:col-span-2">
+                {reviews.length === 0 ? (
+                  <div className="text-center py-12 glass-card p-6">
+                    <p className="font-inter text-espresso-300">No reviews yet. Be the first to review this product!</p>
+                  </div>
+                ) : (
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    {topReviews.map(r => (
+                      <div key={r.id} className="glass-card p-6">
+                        <div className="flex gap-1 mb-3">
+                          {[...Array(r.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-gold-400 text-gold-400" />)}
+                        </div>
+                        <h4 className="font-inter font-bold text-sm text-espresso mb-1">{r.title}</h4>
+                        <p className="font-playfair italic text-sm text-espresso-400 mb-4">"{r.content}"</p>
+                        <p className="font-inter font-bold text-xs text-espresso">{r.customer_name}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

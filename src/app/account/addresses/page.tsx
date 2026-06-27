@@ -17,34 +17,76 @@ import { createClient } from '@/lib/supabase/client';
 export default function AddressesPage() {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useState({
+    full_name: '', phone: '', email: '', line1: '', city: '', state: 'Tamil Nadu', pincode: '', label: 'Home'
+  });
+
+  const fetchAddresses = async () => {
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('addresses')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('is_default', { ascending: false });
+
+      if (error) throw error;
+      setAddresses(data || []);
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchAddresses() {
-      try {
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          setLoading(false);
-          return;
-        }
-
-        const { data, error } = await supabase
-          .from('addresses')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('is_default', { ascending: false });
-
-        if (error) throw error;
-        setAddresses(data || []);
-      } catch (error) {
-        console.error('Error fetching addresses:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchAddresses();
   }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not logged in');
+
+      const isFirst = addresses.length === 0;
+      
+      const { error } = await supabase.from('addresses').insert({
+        ...formData,
+        user_id: user.id,
+        is_default: isFirst
+      });
+      
+      if (error) throw error;
+      toast.success('Address saved successfully');
+      setShowForm(false);
+      fetchAddresses();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to save address');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this address?')) return;
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.from('addresses').delete().eq('id', id);
+      if (error) throw error;
+      toast.success('Address deleted');
+      fetchAddresses();
+    } catch (error) {
+      toast.error('Failed to delete address');
+    }
+  };
 
   if (loading) {
     return (
@@ -63,12 +105,54 @@ export default function AddressesPage() {
         <h2 className="font-playfair text-xl font-semibold text-espresso">
           Saved Addresses
         </h2>
-        <Button variant="outline" size="sm" icon={<Plus className="w-4 h-4" />}>
-          Add New
-        </Button>
+        {!showForm && (
+          <Button variant="outline" size="sm" icon={<Plus className="w-4 h-4" />} onClick={() => setShowForm(true)}>
+            Add New
+          </Button>
+        )}
       </div>
 
-      {addresses.length === 0 ? (
+      {showForm ? (
+        <GlassCard variant="strong" padding="lg">
+          <h3 className="font-playfair text-lg font-semibold text-espresso mb-4">Add New Address</h3>
+          <form onSubmit={handleSave} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-inter font-semibold text-espresso-300 mb-1">Label (e.g. Home, Work)</label>
+                <input type="text" required value={formData.label} onChange={e => setFormData({...formData, label: e.target.value})} className="w-full h-10 px-3 text-sm bg-white border border-gold-400/20 rounded-lg focus:outline-none focus:border-gold-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-inter font-semibold text-espresso-300 mb-1">Full Name</label>
+                <input type="text" required value={formData.full_name} onChange={e => setFormData({...formData, full_name: e.target.value})} className="w-full h-10 px-3 text-sm bg-white border border-gold-400/20 rounded-lg focus:outline-none focus:border-gold-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-inter font-semibold text-espresso-300 mb-1">Phone</label>
+                <input type="tel" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full h-10 px-3 text-sm bg-white border border-gold-400/20 rounded-lg focus:outline-none focus:border-gold-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-inter font-semibold text-espresso-300 mb-1">Pincode</label>
+                <input type="text" required value={formData.pincode} onChange={e => setFormData({...formData, pincode: e.target.value})} className="w-full h-10 px-3 text-sm bg-white border border-gold-400/20 rounded-lg focus:outline-none focus:border-gold-500" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-inter font-semibold text-espresso-300 mb-1">Address Line 1</label>
+                <input type="text" required value={formData.line1} onChange={e => setFormData({...formData, line1: e.target.value})} className="w-full h-10 px-3 text-sm bg-white border border-gold-400/20 rounded-lg focus:outline-none focus:border-gold-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-inter font-semibold text-espresso-300 mb-1">City</label>
+                <input type="text" required value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} className="w-full h-10 px-3 text-sm bg-white border border-gold-400/20 rounded-lg focus:outline-none focus:border-gold-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-inter font-semibold text-espresso-300 mb-1">State</label>
+                <input type="text" required value={formData.state} onChange={e => setFormData({...formData, state: e.target.value})} className="w-full h-10 px-3 text-sm bg-white border border-gold-400/20 rounded-lg focus:outline-none focus:border-gold-500" />
+              </div>
+            </div>
+            <div className="flex gap-4 pt-4 mt-4 border-t border-gold-400/20">
+              <Button type="submit" disabled={isSaving}>{isSaving ? 'SAVING...' : 'SAVE ADDRESS'}</Button>
+              <Button type="button" variant="outline" onClick={() => setShowForm(false)}>CANCEL</Button>
+            </div>
+          </form>
+        </GlassCard>
+      ) : addresses.length === 0 ? (
         <GlassCard variant="strong" padding="lg" className="text-center py-16">
           <MapPin className="w-16 h-16 text-pearl-400 mx-auto mb-4" />
           <h3 className="font-playfair text-lg font-semibold text-espresso mb-2">
@@ -77,7 +161,7 @@ export default function AddressesPage() {
           <p className="font-inter text-sm text-espresso-200 mb-6">
             Add an address for faster checkout.
           </p>
-          <Button icon={<Plus className="w-4 h-4" />}>ADD ADDRESS</Button>
+          <Button icon={<Plus className="w-4 h-4" />} onClick={() => setShowForm(true)}>ADD ADDRESS</Button>
         </GlassCard>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -105,7 +189,7 @@ export default function AddressesPage() {
                   <Pencil className="w-3 h-3" />
                   Edit
                 </button>
-                <button className="flex items-center gap-1 text-xs font-inter text-espresso-200 hover:text-red-500 transition-colors">
+                <button onClick={() => handleDelete(addr.id)} className="flex items-center gap-1 text-xs font-inter text-espresso-200 hover:text-red-500 transition-colors">
                   <Trash2 className="w-3 h-3" />
                   Delete
                 </button>

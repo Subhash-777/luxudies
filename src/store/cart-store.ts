@@ -33,8 +33,8 @@ interface CartStore {
   // Computed
   getItemCount: () => number;
   getSubtotal: () => number;
-  getShipping: () => number;
-  getTotal: () => number;
+  getShipping: (state?: string) => number;
+  getTotal: (state?: string) => number;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -44,16 +44,8 @@ export const useCartStore = create<CartStore>()(
       isOpen: false,
 
       addItem: async (product, variant = null, quantity = 1) => {
-        // Auth check first
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          toast.error('Please sign in to add items to your cart');
-          if (typeof window !== 'undefined') {
-            window.location.href = '/auth/login?redirect=/shop';
-          }
-          return;
-        }
 
         // 1. Optimistic UI update
         let isNewItem = true;
@@ -79,33 +71,35 @@ export const useCartStore = create<CartStore>()(
         });
 
         // 2. Background Sync
-        try {
-          if (isNewItem) {
-            await supabase.from('cart_items').insert({
-              user_id: user.id,
-              product_id: product.id,
-              variant_id: variant?.id || null,
-              quantity: quantity
-            });
-          } else {
-            // Fetch current DB quantity to update correctly
-            const { data: currentItem } = await supabase.from('cart_items')
-              .select('quantity')
-              .eq('user_id', user.id)
-              .eq('product_id', product.id)
-              .is('variant_id', variant?.id || null)
-              .single();
-              
-            if (currentItem) {
-              await supabase.from('cart_items')
-                .update({ quantity: currentItem.quantity + quantity })
+        if (user) {
+          try {
+            if (isNewItem) {
+              await supabase.from('cart_items').insert({
+                user_id: user.id,
+                product_id: product.id,
+                variant_id: variant?.id || null,
+                quantity: quantity
+              });
+            } else {
+              // Fetch current DB quantity to update correctly
+              const { data: currentItem } = await supabase.from('cart_items')
+                .select('quantity')
                 .eq('user_id', user.id)
                 .eq('product_id', product.id)
-                .is('variant_id', variant?.id || null);
+                .is('variant_id', variant?.id || null)
+                .single();
+                
+              if (currentItem) {
+                await supabase.from('cart_items')
+                  .update({ quantity: currentItem.quantity + quantity })
+                  .eq('user_id', user.id)
+                  .eq('product_id', product.id)
+                  .is('variant_id', variant?.id || null);
+              }
             }
+          } catch (error) {
+            console.error("Cart sync error:", error);
           }
-        } catch (error) {
-          console.error("Cart sync error:", error);
         }
       },
 
@@ -182,7 +176,10 @@ export const useCartStore = create<CartStore>()(
               quantity,
               product_id,
               variant_id,
-              product:products(*),
+              product:products(
+                *,
+                images:product_images(*)
+              ),
               variant:product_variants(*)
             `)
             .eq('user_id', user.id);
@@ -234,13 +231,16 @@ export const useCartStore = create<CartStore>()(
         }, 0);
       },
 
-      getShipping: () => {
+      getShipping: (state?: string) => {
         // Free shipping across Tamil Nadu
+        if (state && state.trim().toLowerCase() !== 'tamil nadu') {
+          return 99;
+        }
         return 0;
       },
 
-      getTotal: () => {
-        return get().getSubtotal() + get().getShipping();
+      getTotal: (state?: string) => {
+        return get().getSubtotal() + get().getShipping(state);
       },
     }),
     {

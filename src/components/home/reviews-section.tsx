@@ -8,60 +8,53 @@ import { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 
-const reviews = [
-  {
-    id: 1,
-    name: "Priya S.",
-    location: "Chennai, TN",
-    rating: 5,
-    text: "The signature bow pendant is absolutely stunning. It has that perfect 18K gold shine and doesn't irritate my sensitive skin at all. Highly recommend!",
-    product: "Signature Bow Pendant"
-  },
-  {
-    id: 2,
-    name: "Ananya R.",
-    location: "Bangalore, KA",
-    rating: 5,
-    text: "I bought the everyday essentials combo. The packaging was so premium, it felt like opening a luxury gift. The minimalist ring is my new favorite.",
-    product: "Everyday Essentials Combo"
-  },
-  {
-    id: 3,
-    name: "Karthik M.",
-    location: "Coimbatore, TN",
-    rating: 5,
-    text: "Gifted the pearl drop earrings to my wife for our anniversary. She loves how lightweight they are. The quality is exceptional for the price.",
-    product: "Pearl Drop Earrings"
-  },
-  {
-    id: 4,
-    name: "Sneha V.",
-    location: "Hyderabad, TS",
-    rating: 5,
-    text: "Been wearing the chain bracelet daily, even in the shower. True to their word, absolutely zero tarnishing. Beautiful craftsmanship.",
-    product: "Classic Chain Bracelet"
-  }
-];
+// Removed dummy reviews
 
 export default function ReviewsSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [stats, setStats] = useState({ average: 0, total: 0 });
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
     const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    const progress = scrollLeft / (scrollWidth - clientWidth);
+    const progress = scrollLeft / (scrollWidth - clientWidth) || 0;
     setScrollProgress(progress);
   };
 
   useEffect(() => {
+    async function fetchReviews() {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      
+      const { data, count } = await supabase
+        .from('reviews')
+        .select('*, products(name)', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .limit(10);
+        
+      if (data && data.length > 0) {
+        setReviews(data);
+        
+        // Calculate average
+        const avg = data.reduce((acc, curr) => acc + curr.rating, 0) / data.length;
+        setStats({ average: Number(avg.toFixed(1)), total: count || data.length });
+      }
+    }
+    fetchReviews();
+  }, []);
+
+  useEffect(() => {
     const el = scrollRef.current;
-    if (el) {
+    if (el && reviews.length > 0) {
       el.addEventListener('scroll', handleScroll);
       handleScroll(); // Init
       return () => el.removeEventListener('scroll', handleScroll);
     }
-  }, []);
+  }, [reviews]);
+
+  if (reviews.length === 0) return null;
 
   return (
     <section className="py-20 lg:py-32 bg-ivory-50 relative overflow-hidden">
@@ -81,8 +74,8 @@ export default function ReviewsSection() {
               ))}
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="font-playfair text-4xl font-bold text-espresso">4.9</span>
-              <span className="font-inter text-sm text-espresso-300">based on 1,200+ reviews</span>
+              <span className="font-playfair text-4xl font-bold text-espresso">{stats.average}</span>
+              <span className="font-inter text-sm text-espresso-300">based on {stats.total} {stats.total === 1 ? 'review' : 'reviews'}</span>
             </div>
           </div>
           
@@ -116,18 +109,18 @@ export default function ReviewsSection() {
                 </div>
                 
                 <p className="font-playfair italic text-lg lg:text-xl text-espresso-400 leading-relaxed flex-1 mb-6">
-                  "{review.text}"
+                  "{review.content}"
                 </p>
 
                 <div className="mt-auto border-t border-gold-400/10 pt-4">
                   <p className="font-inter font-bold text-sm text-espresso mb-0.5">
-                    {review.name}
+                    {review.customer_name}
                   </p>
                   <p className="font-inter text-xs text-espresso-300 mb-2">
-                    {review.location}
+                    {review.is_verified ? 'Verified Buyer' : 'Customer'}
                   </p>
-                  <p className="font-inter text-[10px] text-gold-500 uppercase tracking-wider">
-                    Purchased: {review.product}
+                  <p className="font-inter text-[10px] text-gold-500 uppercase tracking-wider line-clamp-1">
+                    Purchased: {review.products?.name || 'Product'}
                   </p>
                 </div>
               </div>
