@@ -97,7 +97,6 @@ export async function POST(request: NextRequest) {
       payment_method: 'paytm',
       payment_status: 'pending',
       razorpay_order_id: null, // Keep column for legacy but set to null
-      paytm_order_id: orderNumber, // Can just use order number
       status: 'pending'
     }).select('id').single();
 

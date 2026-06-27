@@ -16,6 +16,7 @@ import { useCartStore } from '@/store/cart-store';
 import { formatPrice } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { createClient } from '@/lib/supabase/client';
+import { INDIA_STATES, STATE_CITY_MAP } from '@/lib/locations';
 
 interface AddressForm {
   fullName: string;
@@ -29,12 +30,6 @@ interface AddressForm {
   pincode: string;
 }
 
-const TAMIL_NADU_CITIES = [
-  'Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem',
-  'Tirunelveli', 'Tiruppur', 'Vellore', 'Erode', 'Thoothukkudi',
-  'Dindigul', 'Thanjavur', 'Ranipet', 'Sivakasi', 'Karur',
-  'Udhagamandalam', 'Hosur', 'Nagercoil', 'Kanchipuram', 'Other',
-];
 
 export default function CheckoutPage() {
   const { items, getSubtotal, getTotal, getShipping, clearCart } = useCartStore();
@@ -51,6 +46,34 @@ export default function CheckoutPage() {
     pincode: '',
   });
 
+  const [customCity, setCustomCity] = useState('');
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+
+  const handleAddressSelect = (addr: any) => {
+    const newState = addr.state || 'Tamil Nadu';
+    const newCity = addr.city || '';
+    
+    setAddress({
+      fullName: addr.full_name || '',
+      phone: addr.phone || '',
+      alternatePhone: addr.alternate_phone || '',
+      email: addr.email || address.email,
+      line1: addr.line1 || '',
+      line2: addr.line2 || '',
+      city: newCity,
+      state: newState,
+      pincode: addr.pincode || '',
+    });
+    
+    const availableCities = STATE_CITY_MAP[newState] || [];
+    if (newCity && !availableCities.includes(newCity)) {
+      setAddress(prev => ({ ...prev, city: 'Other' }));
+      setCustomCity(newCity);
+    } else {
+      setCustomCity('');
+    }
+  };
+
   useEffect(() => {
     async function checkAuth() {
       const supabase = createClient();
@@ -58,6 +81,22 @@ export default function CheckoutPage() {
       if (!user) {
         toast.error('Please sign in to checkout');
         window.location.href = '/auth/login?redirect=/checkout';
+      } else {
+        const { data: addrs } = await supabase.from('addresses').select('*').eq('user_id', user.id).order('is_default', { ascending: false });
+        if (addrs && addrs.length > 0) {
+          setSavedAddresses(addrs);
+          handleAddressSelect(addrs[0]);
+        } else {
+          setAddress(prev => ({ ...prev, email: user.email || '' }));
+          const { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single();
+          if (profile) {
+            setAddress(prev => ({
+              ...prev,
+              fullName: profile.full_name || prev.fullName,
+              phone: profile.phone || prev.phone,
+            }));
+          }
+        }
       }
     }
     checkAuth();
@@ -73,6 +112,20 @@ export default function CheckoutPage() {
     }
   }, []);
 
+  const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newState = e.target.value;
+    setAddress(prev => ({ ...prev, state: newState, city: '' }));
+    setCustomCity('');
+  };
+
+  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const newCity = e.target.value;
+    setAddress(prev => ({ ...prev, city: newCity }));
+    if (newCity !== 'Other') {
+      setCustomCity('');
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setAddress((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -82,7 +135,7 @@ export default function CheckoutPage() {
     if (!address.phone.trim() || address.phone.length < 10) { toast.error('Please enter a valid phone number'); return false; }
     if (!address.email.trim() || !address.email.includes('@')) { toast.error('Please enter a valid email address'); return false; }
     if (!address.line1.trim()) { toast.error('Please enter your address'); return false; }
-    if (!address.city.trim()) { toast.error('Please select your city'); return false; }
+    if (!address.city.trim() || (address.city === 'Other' && !customCity.trim())) { toast.error('Please enter your city'); return false; }
     if (!address.pincode.trim() || address.pincode.length < 6) { toast.error('Please enter a valid pincode'); return false; }
     return true;
   };
@@ -110,7 +163,10 @@ export default function CheckoutPage() {
               quantity: item.quantity,
             };
           }),
-          address,
+          address: {
+            ...address,
+            city: address.city === 'Other' ? customCity : address.city
+          },
         }),
       });
 
@@ -219,6 +275,33 @@ export default function CheckoutPage() {
                   Shipping Details
                 </h2>
 
+                {savedAddresses.length > 0 && (
+                  <div className="mb-8">
+                    <label className={labelClasses}>Saved Addresses</label>
+                    <div className="relative">
+                      <select 
+                        className={`${inputClasses} appearance-none pr-10`}
+                        onChange={(e) => {
+                          if (e.target.value === 'new') {
+                            setAddress(prev => ({ fullName: '', phone: '', alternatePhone: '', email: prev.email, line1: '', line2: '', city: '', state: 'Tamil Nadu', pincode: '' }));
+                            setCustomCity('');
+                          } else {
+                            handleAddressSelect(savedAddresses[parseInt(e.target.value)]);
+                          }
+                        }}
+                      >
+                        <option value="new">-- Enter New Address --</option>
+                        {savedAddresses.map((addr, idx) => (
+                          <option key={addr.id} value={idx}>
+                            {addr.label || 'Address'} - {addr.full_name}, {addr.city}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso-200 pointer-events-none" />
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8">
                   <div className="sm:col-span-2">
                     <label htmlFor="fullName" className={labelClasses}>Full Name *</label>
@@ -250,25 +333,33 @@ export default function CheckoutPage() {
                     <input id="line2" name="line2" type="text" placeholder="Landmark, Area (Optional)" value={address.line2} onChange={handleChange} className={inputClasses} />
                   </div>
 
-                  <div>
-                    <label htmlFor="city" className={labelClasses}>City *</label>
+                  <div className="sm:col-span-2">
+                    <label htmlFor="state" className={labelClasses}>State *</label>
                     <div className="relative">
-                      <select id="city" name="city" value={address.city} onChange={handleChange} className={`${inputClasses} appearance-none pr-10`} required>
-                        <option value="">Select city</option>
-                        {TAMIL_NADU_CITIES.map((city) => <option key={city} value={city}>{city}</option>)}
+                      <select id="state" name="state" value={address.state} onChange={handleStateChange} className={`${inputClasses} appearance-none pr-10`} required>
+                        {INDIA_STATES.map((state) => <option key={state} value={state}>{state}</option>)}
                       </select>
                       <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso-200 pointer-events-none" />
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="pincode" className={labelClasses}>Pincode *</label>
-                    <input id="pincode" name="pincode" type="text" value={address.pincode} onChange={handleChange} className={inputClasses} maxLength={6} required />
+                    <label htmlFor="city" className={labelClasses}>City *</label>
+                    <div className="relative mb-2">
+                      <select id="city" name="city" value={address.city} onChange={handleCityChange} className={`${inputClasses} appearance-none pr-10`} required>
+                        <option value="">Select city</option>
+                        {(STATE_CITY_MAP[address.state] || ['Other']).map((city) => <option key={city} value={city}>{city}</option>)}
+                      </select>
+                      <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-espresso-200 pointer-events-none" />
+                    </div>
+                    {address.city === 'Other' && (
+                      <input type="text" placeholder="Enter your city" value={customCity} onChange={(e) => setCustomCity(e.target.value)} className={inputClasses} required />
+                    )}
                   </div>
 
-                  <div className="sm:col-span-2">
-                    <label htmlFor="state" className={labelClasses}>State</label>
-                    <input id="state" name="state" type="text" value={address.state} className={`${inputClasses} bg-pearl-200/50 cursor-not-allowed`} readOnly />
+                  <div>
+                    <label htmlFor="pincode" className={labelClasses}>Pincode *</label>
+                    <input id="pincode" name="pincode" type="text" value={address.pincode} onChange={handleChange} className={inputClasses} maxLength={6} required />
                   </div>
                 </div>
               </div>
