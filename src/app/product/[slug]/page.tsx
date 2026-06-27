@@ -232,7 +232,7 @@ export default function ProductDetailPage() {
                     className="absolute inset-0"
                   >
                     <Image
-                      src={product.images?.[selectedImageIndex]?.url || product.images?.[0]?.url || '/images/brand/logo.jpg'}
+                      src={product.images?.at(Number(selectedImageIndex))?.url || product.images?.at(0)?.url || '/images/brand/logo.jpg'}
                       alt={product.name}
                       fill
                       className="object-contain sm:object-cover scale-100 group-hover:scale-105 transition-transform duration-700 origin-center"
