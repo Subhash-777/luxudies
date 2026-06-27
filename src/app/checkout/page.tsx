@@ -37,7 +37,7 @@ const TAMIL_NADU_CITIES = [
 ];
 
 export default function CheckoutPage() {
-  const { items, getSubtotal, getTotal, clearCart } = useCartStore();
+  const { items, getSubtotal, getTotal, getShipping, clearCart } = useCartStore();
   const [isProcessing, setIsProcessing] = useState(false);
   const [address, setAddress] = useState<AddressForm>({
     fullName: '',
