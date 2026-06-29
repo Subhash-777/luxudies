@@ -52,8 +52,8 @@ export default function HeroSection() {
     >
       {/* Parallax Background Layer */}
       <motion.div style={{ y: yBg }} className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gold-100/30 rounded-full blur-[120px] -translate-y-1/4 translate-x-1/4" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gold-200/20 rounded-full blur-[100px] translate-y-1/4 -translate-x-1/4" />
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gold-100/20 rounded-full blur-[140px] -translate-y-1/4 translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-pearl-300/30 rounded-full blur-[120px] translate-y-1/4 -translate-x-1/4" />
         <GoldParticles />
       </motion.div>
 
@@ -66,10 +66,10 @@ export default function HeroSection() {
             className="order-1 lg:order-2 relative mx-auto w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[500px]"
           >
             {/* Elegant Glass Arch Background */}
-            <div className="absolute inset-0 top-4 bottom-4 rounded-t-full rounded-b-3xl bg-gradient-to-b from-white/60 to-white/10 backdrop-blur-2xl border border-white/50 shadow-[0_30px_60px_rgba(58,42,30,0.08)] scale-105" />
+            <div className="absolute inset-0 top-4 bottom-4 rounded-t-full rounded-b-[40px] bg-gradient-to-b from-white/80 to-white/20 backdrop-blur-3xl border border-gold-400/15 shadow-[0_40px_80px_rgba(58,42,30,0.06)] scale-105 transition-all duration-1000" />
             
             {/* Radial gold glow behind floating product */}
-            <div className="absolute inset-0 bg-gold-300/10 rounded-t-full rounded-b-3xl blur-2xl scale-95" />
+            <div className="absolute inset-0 bg-gold-200/20 rounded-t-full rounded-b-[40px] blur-3xl scale-95" />
 
             <div className="relative animate-[float_6s_ease-in-out_infinite] z-10 px-6 py-12">
               <Image
@@ -87,10 +87,10 @@ export default function HeroSection() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 1, duration: 0.8 }}
-              className="absolute -bottom-4 -left-4 sm:-left-10 bg-white/90 backdrop-blur-md border border-gold-400/20 px-6 py-4 rounded-2xl shadow-xl z-20"
+              className="absolute -bottom-4 -left-4 sm:-left-10 bg-white/95 backdrop-blur-md border border-gold-400/20 px-6 py-4 rounded-2xl shadow-elevated z-20"
             >
-              <p className="font-playfair font-bold text-espresso text-lg mb-0.5">Premium Anti-Tarnish</p>
-              <p className="font-inter text-xs text-espresso-300 tracking-wide uppercase">Everyday Elegance</p>
+              <p className="font-playfair font-bold text-espresso text-lg mb-0.5 tracking-tight">Premium Anti-Tarnish</p>
+              <p className="font-inter text-[10px] text-espresso-300 tracking-[0.2em] uppercase font-semibold">Everyday Elegance</p>
             </motion.div>
           </motion.div>
 
@@ -121,7 +121,7 @@ export default function HeroSection() {
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 0.8, delay: 0.4, ease: [0.23, 1, 0.32, 1] }}
-              className="w-24 h-[2px] bg-gold-400 origin-left mb-6 lg:mb-8"
+              className="w-32 h-[1px] bg-gradient-to-r from-gold-400 to-transparent origin-left mb-6 lg:mb-8"
             />
 
             <motion.p

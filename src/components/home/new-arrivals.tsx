@@ -46,7 +46,7 @@ export default function NewArrivals() {
   }, []);
 
   return (
-    <section className="py-16 sm:py-20 lg:py-24 bg-pearl relative overflow-hidden">
+    <section className="py-20 sm:py-24 lg:py-32 bg-pearl relative overflow-hidden">
       <div className="container-luxury relative z-10">
         <div className="text-center mb-12 sm:mb-16">
           <motion.div

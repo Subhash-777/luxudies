@@ -46,7 +46,7 @@ export default function Bestsellers() {
   }, []);
 
   return (
-    <section className="py-16 sm:py-20 lg:py-24 bg-pearl relative overflow-hidden">
+    <section className="py-20 sm:py-24 lg:py-32 bg-pearl relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gold-400/20 to-transparent" />
       <div className="absolute top-1/4 right-0 w-64 h-64 bg-gold-400/5 rounded-full blur-3xl" />

@@ -99,9 +99,9 @@ export default function Header() {
             : 'border-b border-transparent'
         )}
         style={{
-          background: isScrolled ? 'rgba(247, 243, 238, 0.85)' : 'transparent',
-          backdropFilter: isScrolled ? 'blur(12px)' : 'none',
-          WebkitBackdropFilter: isScrolled ? 'blur(12px)' : 'none'
+          background: isScrolled ? 'rgba(255, 255, 255, 0.9)' : 'transparent',
+          backdropFilter: isScrolled ? 'blur(16px)' : 'none',
+          WebkitBackdropFilter: isScrolled ? 'blur(16px)' : 'none'
         }}
       >
         <div className="container-luxury relative">

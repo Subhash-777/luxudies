@@ -59,7 +59,7 @@ export default function ProductCard({
       whileHover={{ y: -4 }}
     >
       <Link href={`/product/${product.slug}`} className="group block h-full">
-        <div className="glass-card flex flex-col h-full overflow-hidden transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-medium group-hover:border-gold-400/30">
+        <div className="frame-luxury rounded-2xl flex flex-col h-full overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:shadow-medium group-hover:scale-[1.02] relative">
           
           {/* Image Container - Top 60% approx */}
           <div className="relative aspect-[4/5] sm:aspect-[3/4] overflow-hidden bg-pearl-100 flex-shrink-0">
@@ -68,7 +68,7 @@ export default function ProductCard({
                 src={primaryImage.url}
                 alt={primaryImage.alt_text || product.name}
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                className="object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-110"
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
             )}
@@ -98,8 +98,8 @@ export default function ProductCard({
           </div>
 
           {/* Product Info */}
-          <div className="flex flex-col flex-1 p-4 sm:p-5">
-            <h3 className="font-playfair text-base sm:text-lg font-semibold text-espresso line-clamp-2 group-hover:text-gold-500 transition-colors mb-1">
+          <div className="flex flex-col flex-1 p-4 sm:p-5 bg-white">
+            <h3 className="font-playfair text-base sm:text-lg font-semibold text-espresso line-clamp-2 group-hover:text-gold-500 transition-colors duration-500 mb-1">
               {product.name}
             </h3>
             <p className="text-xs text-espresso-200 line-clamp-1 font-inter mb-3 flex-1">
@@ -120,10 +120,10 @@ export default function ProductCard({
               </div>
 
               {/* Add to Cart Button */}
-              <div className="lg:overflow-hidden">
+              <div className="lg:overflow-hidden relative z-10 bg-white">
                 <button
                   onClick={handleAddToCart}
-                  className="w-full btn-ghost-gold h-10 text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 lg:translate-y-[120%] lg:group-hover:translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                  className="w-full btn-ghost-gold h-10 text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 lg:translate-y-[120%] lg:group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]"
                 >
                   <ShoppingBag className="w-3.5 h-3.5" />
                   Add to Cart

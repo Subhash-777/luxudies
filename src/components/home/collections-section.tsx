@@ -62,7 +62,7 @@ export default function CollectionsSection() {
   }, []);
 
   return (
-    <section className="py-20 lg:py-32 bg-pearl relative overflow-hidden">
+    <section className="py-24 lg:py-40 bg-pearl relative overflow-hidden">
       {/* Decorative background glow */}
       <div className="absolute top-1/2 left-0 w-full h-full bg-ivory-50 rounded-full blur-[100px] -translate-y-1/2 opacity-50 pointer-events-none" />
 
@@ -113,8 +113,9 @@ export default function CollectionsSection() {
               transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
             >
               <Link href={`/shop?category=${collection.slug}`} className="group block h-full">
-                <div className="glass-card overflow-hidden h-[360px] lg:h-[420px] relative transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-medium group-hover:border-gold-400/30">
-                  <div className="absolute inset-0 bg-pearl-100">
+                <div className="frame-luxury rounded-[24px] overflow-hidden h-[360px] lg:h-[420px] relative transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:-translate-y-2 group-hover:shadow-medium">
+                  <div className="absolute inset-0 bg-pearl-100 p-2">
+                    <div className="relative w-full h-full rounded-[16px] overflow-hidden">
                     <Image
                       src={collection.image}
                       alt={collection.name}
@@ -122,11 +123,11 @@ export default function CollectionsSection() {
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     />
-                    {/* Gradient overlay to ensure text readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-espresso-500/80 via-espresso-500/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-espresso-500/80 via-espresso-500/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+                  </div>
                   </div>
                   
-                  <div className="absolute bottom-0 left-0 w-full p-6 lg:p-8 flex items-end justify-between">
+                  <div className="absolute bottom-4 left-4 right-4 p-6 lg:p-8 flex items-end justify-between pointer-events-none z-10">
                     <div>
                       <p className="text-pearl-200 text-xs font-inter uppercase tracking-widest mb-1 opacity-80 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                         {collection.description}
