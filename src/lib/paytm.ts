@@ -32,8 +32,8 @@ export const getPaytmConfig = (): PaytmConfig => {
   }
 
   return {
-    mid: mid || 'MOCK_MID_FOR_BUILD',
-    merchantKey: merchantKey || 'MOCK_KEY_FOR_BUILD',
+    mid: mid || 'MOCK_MID_123456',
+    merchantKey: merchantKey || 'MOCK_KEY_1234567', // MUST be exactly 16 characters for AES-128
     website: website,
     channelId: 'WEB',
     industryTypeId: 'Retail',
