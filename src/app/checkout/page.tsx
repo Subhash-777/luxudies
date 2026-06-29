@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -36,11 +36,9 @@ interface AddressForm {
 export default function CheckoutPage() {
   const { items, getSubtotal, getTotal, getShipping, clearCart } = useCartStore();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paytmLoaded, setPaytmLoaded] = useState(false);
   const [customCity, setCustomCity] = useState('');
   const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
   const [selectedAddressIdx, setSelectedAddressIdx] = useState<string>('new');
-  const paytmScriptRef = useRef<HTMLScriptElement | null>(null);
 
   const [address, setAddress] = useState<AddressForm>({
     fullName: '',
@@ -111,28 +109,8 @@ export default function CheckoutPage() {
           phone: profile?.phone || '',
         }));
       }
-
-      // Load Paytm JS
-      const mid = process.env.NEXT_PUBLIC_PAYTM_MID;
-      const env = process.env.NEXT_PUBLIC_PAYTM_ENVIRONMENT === 'STAGING' ? 'securegw-stage' : 'securegw';
-      if (mid) {
-        const script = document.createElement('script');
-        script.src = `https://${env}.paytm.in/merchantpgpui/checkoutjs/merchants/${mid}.js`;
-        script.async = true;
-        script.crossOrigin = 'anonymous';
-        script.onload = () => setPaytmLoaded(true);
-        script.onerror = () => console.warn('Paytm script failed to load');
-        document.body.appendChild(script);
-        paytmScriptRef.current = script;
-      }
     }
     init();
-
-    return () => {
-      if (paytmScriptRef.current) {
-        document.body.removeChild(paytmScriptRef.current);
-      }
-    };
   }, []);
 
   const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -205,38 +183,23 @@ export default function CheckoutPage() {
         throw new Error(data.error || 'Payment initiation failed. Please try again.');
       }
 
-      // Launch Paytm Checkout
-      const paytmConfig = {
-        root: '',
-        flow: 'DEFAULT',
-        data: {
-          orderId: data.orderId,
-          token: data.txnToken,
-          tokenType: 'TXN_TOKEN',
-          amount: String(data.amount),
-        },
-        handler: {
-          notifyMerchant(eventName: string, eventData: any) {
-            console.log('Paytm event:', eventName, eventData);
-            if (eventName === 'APP_CLOSED') {
-              setIsProcessing(false);
-              toast('Payment window closed', { icon: '⚠️' });
-            }
-          },
-        },
-      };
+      // ── Redirect to Paytm payment page (works in all environments, no CORS) ──
+      const env = data.environment === 'STAGING' ? 'securegw-stage' : 'securegw';
+      const paytmUrl = `https://${env}.paytm.in/theia/api/v1/showPaymentPage?mid=${data.mid}&orderId=${data.orderId}`;
 
-      // @ts-ignore
-      if (window.Paytm && window.Paytm.CheckoutJS) {
-        // @ts-ignore
-        await window.Paytm.CheckoutJS.init(paytmConfig);
-        // @ts-ignore
-        window.Paytm.CheckoutJS.invoke();
-      } else {
-        // Paytm JS not loaded yet — open redirect flow as fallback
-        toast.error('Payment gateway is loading. Please wait a moment and try again.');
-        setIsProcessing(false);
-      }
+      // Create and submit a hidden form (required by Paytm spec)
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = paytmUrl;
+
+      const tokenInput = document.createElement('input');
+      tokenInput.type = 'hidden';
+      tokenInput.name = 'txnToken';
+      tokenInput.value = data.txnToken;
+
+      form.appendChild(tokenInput);
+      document.body.appendChild(form);
+      form.submit();
     } catch (error: any) {
       console.error('Payment error:', error);
       toast.error(error?.message || 'Something went wrong. Please try again.');
