@@ -22,6 +22,7 @@ import {
   Truck,
   Shield,
   ArrowLeft,
+  ChevronDown,
 } from 'lucide-react';
 import Header from '@/components/layout/header';
 import MobileNav from '@/components/layout/mobile-nav';
@@ -41,10 +42,13 @@ export default function ProductDetailPage() {
   
   const [product, setProduct] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showStickyCart, setShowStickyCart] = useState(false);
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+  const [activeAccordion, setActiveAccordion] = useState<string | null>('description');
   const mainCtaRef = useRef<HTMLDivElement>(null);
 
   const addItem = useCartStore((s) => s.addItem);
@@ -84,9 +88,39 @@ export default function ProductDetailPage() {
           .from('reviews')
           .select('*')
           .eq('product_id', data.id)
+          .eq('is_approved', true)
           .order('created_at', { ascending: false });
           
         if (rData) setReviews(rData);
+
+        // Fetch related products (same category)
+        if (data.category) {
+          const { data: relatedData } = await supabase
+            .from('products')
+            .select(`
+              *,
+              images:product_images(*)
+            `)
+            .eq('category', data.category)
+            .eq('is_active', true)
+            .neq('id', data.id)
+            .limit(4);
+          
+          if (relatedData) {
+            // Sort related product images
+            const formattedRelated = relatedData.map(p => {
+              if (p.images) {
+                p.images.sort((a: any, b: any) => {
+                  if (a.is_primary) return -1;
+                  if (b.is_primary) return 1;
+                  return a.sort_order - b.sort_order;
+                });
+              }
+              return p;
+            });
+            setRelatedProducts(formattedRelated);
+          }
+        }
       }
       setLoading(false);
     };
@@ -329,34 +363,117 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              {/* Description */}
-              <p className="font-inter text-sm sm:text-base text-espresso-300 leading-relaxed">
-                {product.description}
-              </p>
+              {/* Product Info Accordions */}
+              <div className="border-t border-gold-400/20 pt-2 pb-6">
+                
+                {/* Description Accordion */}
+                <div className="border-b border-gold-400/10">
+                  <button 
+                    onClick={() => setActiveAccordion(activeAccordion === 'description' ? null : 'description')}
+                    className="flex justify-between items-center w-full py-4 text-left font-playfair font-bold text-espresso tracking-wide hover:text-gold-500 transition-colors"
+                  >
+                    <span>Description</span>
+                    <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", activeAccordion === 'description' ? "rotate-180" : "")} />
+                  </button>
+                  <AnimatePresence>
+                    {activeAccordion === 'description' && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="overflow-hidden"
+                      >
+                        <p className="font-inter text-sm sm:text-base text-espresso-300 leading-relaxed pb-6">
+                          {product.description}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
 
-              {/* Why you'll love it */}
-              <div className="bg-ivory-50 p-6 rounded-2xl border border-gold-400/10">
-                <h3 className="font-playfair text-lg font-bold text-espresso mb-4 flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-gold-500" />
-                  Why you'll love it
-                </h3>
-                <ul className="space-y-3">
-                  {[
-                    "Handcrafted with Premium Finish",
-                    "Anti-tarnish and water-resistant",
-                    "Hypoallergenic and gentle on skin",
-                    "Arrives in signature luxury packaging"
-                  ].map((point, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className="w-1.5 h-1.5 rounded-full bg-gold-400 mt-2 flex-shrink-0" />
-                      <span className="font-inter text-sm text-espresso-300">{point}</span>
-                    </li>
-                  ))}
-                </ul>
+                {/* Materials & Care Accordion */}
+                <div className="border-b border-gold-400/10">
+                  <button 
+                    onClick={() => setActiveAccordion(activeAccordion === 'care' ? null : 'care')}
+                    className="flex justify-between items-center w-full py-4 text-left font-playfair font-bold text-espresso tracking-wide hover:text-gold-500 transition-colors"
+                  >
+                    <span>Materials & Care</span>
+                    <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", activeAccordion === 'care' ? "rotate-180" : "")} />
+                  </button>
+                  <AnimatePresence>
+                    {activeAccordion === 'care' && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pb-6 space-y-4">
+                          <p className="font-inter text-sm text-espresso-300">
+                            Our jewelry is crafted from premium materials designed for everyday wear.
+                          </p>
+                          <ul className="space-y-2">
+                            {[
+                              "Premium 18k Gold Finish",
+                              "Anti-tarnish and water-resistant coating",
+                              "Hypoallergenic, nickel & lead free"
+                            ].map((point, i) => (
+                              <li key={i} className="flex items-start gap-3">
+                                <span className="w-1.5 h-1.5 rounded-full bg-gold-400 mt-1.5 flex-shrink-0" />
+                                <span className="font-inter text-sm text-espresso-300">{point}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Shipping & Returns Accordion */}
+                <div className="border-b border-gold-400/10">
+                  <button 
+                    onClick={() => setActiveAccordion(activeAccordion === 'shipping' ? null : 'shipping')}
+                    className="flex justify-between items-center w-full py-4 text-left font-playfair font-bold text-espresso tracking-wide hover:text-gold-500 transition-colors"
+                  >
+                    <span>Shipping & Returns</span>
+                    <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", activeAccordion === 'shipping' ? "rotate-180" : "")} />
+                  </button>
+                  <AnimatePresence>
+                    {activeAccordion === 'shipping' && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pb-6 space-y-4">
+                          <div className="flex gap-3">
+                            <Truck className="w-5 h-5 text-gold-400 flex-shrink-0" />
+                            <div>
+                              <p className="font-inter font-medium text-sm text-espresso mb-1">Free Delivery in Tamil Nadu</p>
+                              <p className="font-inter text-xs text-espresso-300">Orders are processed within 24 hours. Expected delivery in 2-4 business days.</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-3 pt-2">
+                            <Shield className="w-5 h-5 text-gold-400 flex-shrink-0" />
+                            <div>
+                              <p className="font-inter font-medium text-sm text-espresso mb-1">7-Day Easy Returns</p>
+                              <p className="font-inter text-xs text-espresso-300">Not completely satisfied? Return your unused items in original packaging within 7 days.</p>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
 
               {/* Add to Cart Area */}
-              <div ref={mainCtaRef} className="space-y-4">
+              <div ref={mainCtaRef} className="space-y-4 pt-4">
                 <div className="flex items-center justify-between p-1 bg-pearl-100 rounded-full border border-gold-400/20 max-w-[160px]">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -387,91 +504,119 @@ export default function ProductDetailPage() {
             </motion.div>
           </div>
 
-          {/* Complete The Look (Combo Suggestion) */}
-          <div className="mt-24 pt-16 border-t border-gold-400/20">
-            <h2 className="font-playfair text-3xl lg:text-4xl font-bold text-espresso mb-8 text-center">
-              Complete The Look
-            </h2>
-            <div className="max-w-4xl mx-auto glass-card p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
-              <div className="flex items-center gap-4">
-                <div className="w-24 h-24 rounded-full overflow-hidden relative shadow-soft">
-                  <Image src={product.images?.[0]?.url || '/images/brand/logo.jpg'} alt="" fill className="object-cover" />
-                </div>
-                <Plus className="w-6 h-6 text-gold-400" />
-                <div className="w-24 h-24 rounded-full overflow-hidden relative shadow-soft">
-                  <Image src="/images/products/earrings.jpg" alt="Matching Earrings" fill className="object-cover" />
-                </div>
-              </div>
-              <div className="flex-1 text-center sm:text-left">
-                <h3 className="font-playfair text-xl font-bold text-espresso mb-2">The Golden Duo</h3>
-                <p className="font-inter text-sm text-espresso-200 mb-4">Pair with our Classic Studs to complete the perfect evening look.</p>
-                <div className="flex items-center justify-center sm:justify-start gap-3">
-                  <span className="font-inter font-bold text-lg text-antique">₹5,499</span>
-                  <span className="text-xs text-white bg-gold-500 px-2 py-1 rounded">Save ₹500</span>
-                </div>
-              </div>
-              <button className="btn-ghost-gold px-6 py-3 text-xs w-full sm:w-auto">
-                ADD COMBO
-              </button>
-            </div>
-          </div>
-
-          {/* Reviews Snippet */}
-          <div className="mt-24">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="font-playfair text-3xl font-bold text-espresso">
-                Customer Reviews
+          {/* You May Also Like */}
+          {relatedProducts.length > 0 && (
+            <div className="mt-24 pt-16 border-t border-gold-400/20">
+              <h2 className="font-playfair text-3xl lg:text-4xl font-bold text-espresso mb-8 text-center">
+                You May Also Like
               </h2>
-            </div>
-            
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* Write Review Form */}
-              <div className="lg:col-span-1 glass-card p-6 h-fit">
-                <h3 className="font-playfair text-xl font-bold text-espresso mb-4">Write a Review</h3>
-                <form onSubmit={handleReviewSubmit} className="space-y-4">
-                  <div>
-                    <label className="block font-inter text-xs font-semibold text-espresso-300 uppercase tracking-widest mb-1.5">Your Name</label>
-                    <input name="name" type="text" required className="w-full bg-transparent border-b border-gold-400/20 pb-2 text-espresso focus:outline-none focus:border-gold-500 font-inter placeholder:text-espresso-200" placeholder="John Doe" />
-                  </div>
-                  <div>
-                    <label className="block font-inter text-xs font-semibold text-espresso-300 uppercase tracking-widest mb-1.5">Rating (1-5)</label>
-                    <input name="rating" type="number" min="1" max="5" required className="w-full bg-transparent border-b border-gold-400/20 pb-2 text-espresso focus:outline-none focus:border-gold-500 font-inter placeholder:text-espresso-200" placeholder="5" />
-                  </div>
-                  <div>
-                    <label className="block font-inter text-xs font-semibold text-espresso-300 uppercase tracking-widest mb-1.5">Title</label>
-                    <input name="title" type="text" required className="w-full bg-transparent border-b border-gold-400/20 pb-2 text-espresso focus:outline-none focus:border-gold-500 font-inter placeholder:text-espresso-200" placeholder="Beautiful product!" />
-                  </div>
-                  <div>
-                    <label className="block font-inter text-xs font-semibold text-espresso-300 uppercase tracking-widest mb-1.5">Review</label>
-                    <textarea name="body" required rows={3} className="w-full bg-transparent border-b border-gold-400/20 pb-2 text-espresso focus:outline-none focus:border-gold-500 font-inter placeholder:text-espresso-200 resize-none" placeholder="Tell us what you think..."></textarea>
-                  </div>
-                  <button type="submit" className="w-full btn-ghost-gold px-6 py-3 text-xs">
-                    SUBMIT REVIEW
-                  </button>
-                </form>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+                {relatedProducts.map((p, i) => (
+                  <ProductCard key={p.id} product={p} index={i} />
+                ))}
               </div>
+            </div>
+          )}
 
-              {/* Display Reviews */}
-              <div className="lg:col-span-2">
-                {reviews.length === 0 ? (
-                  <div className="text-center py-12 glass-card p-6">
-                    <p className="font-inter text-espresso-300">No reviews yet. Be the first to review this product!</p>
-                  </div>
-                ) : (
-                  <div className="grid sm:grid-cols-2 gap-6">
-                    {topReviews.map(r => (
-                      <div key={r.id} className="glass-card p-6">
-                        <div className="flex gap-1 mb-3">
-                          {[...Array(r.rating)].map((_, i) => <Star key={i} className="w-4 h-4 fill-gold-400 text-gold-400" />)}
-                        </div>
-                        <h4 className="font-inter font-bold text-sm text-espresso mb-1">{r.title}</h4>
-                        <p className="font-playfair italic text-sm text-espresso-400 mb-4">"{r.content}"</p>
-                        <p className="font-inter font-bold text-xs text-espresso">{r.customer_name}</p>
-                      </div>
+          {/* Customer Reviews Section */}
+          <div className="mt-24 pt-16 border-t border-gold-400/20">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-6">
+              <div>
+                <h2 className="font-playfair text-3xl lg:text-4xl font-bold text-espresso mb-2">
+                  Customer Reviews
+                </h2>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center text-gold-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className={cn("w-5 h-5", i < Math.round(Number(avgRating)) ? "fill-current" : "")} />
                     ))}
                   </div>
-                )}
+                  <span className="font-inter font-medium text-espresso-400">
+                    {reviews.length > 0 ? `${avgRating} out of 5 (${reviews.length} reviews)` : 'No reviews yet'}
+                  </span>
+                </div>
               </div>
+              <button 
+                onClick={() => setIsReviewFormOpen(!isReviewFormOpen)}
+                className="btn-ghost-gold px-8 py-3 text-xs"
+              >
+                {isReviewFormOpen ? 'CANCEL' : 'WRITE A REVIEW'}
+              </button>
+            </div>
+            
+            {/* Expandable Review Form */}
+            <AnimatePresence>
+              {isReviewFormOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden mb-12"
+                >
+                  <div className="frame-luxury p-6 sm:p-8 max-w-2xl mx-auto bg-pearl-50">
+                    <h3 className="font-playfair text-xl font-bold text-espresso mb-6 text-center">Share Your Thoughts</h3>
+                    <form onSubmit={handleReviewSubmit} className="space-y-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block font-inter text-xs font-semibold text-espresso-300 uppercase tracking-widest mb-2">Your Name</label>
+                          <input name="name" type="text" required className="w-full bg-transparent border-b border-gold-400/20 pb-2 text-espresso focus:outline-none focus:border-gold-500 font-inter placeholder:text-espresso-200" placeholder="Jane Doe" />
+                        </div>
+                        <div>
+                          <label className="block font-inter text-xs font-semibold text-espresso-300 uppercase tracking-widest mb-2">Rating (1-5)</label>
+                          <input name="rating" type="number" min="1" max="5" required className="w-full bg-transparent border-b border-gold-400/20 pb-2 text-espresso focus:outline-none focus:border-gold-500 font-inter placeholder:text-espresso-200" placeholder="5" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block font-inter text-xs font-semibold text-espresso-300 uppercase tracking-widest mb-2">Review Title</label>
+                        <input name="title" type="text" required className="w-full bg-transparent border-b border-gold-400/20 pb-2 text-espresso focus:outline-none focus:border-gold-500 font-inter placeholder:text-espresso-200" placeholder="Beautiful and elegant" />
+                      </div>
+                      <div>
+                        <label className="block font-inter text-xs font-semibold text-espresso-300 uppercase tracking-widest mb-2">Your Review</label>
+                        <textarea name="body" required rows={4} className="w-full bg-transparent border-b border-gold-400/20 pb-2 text-espresso focus:outline-none focus:border-gold-500 font-inter placeholder:text-espresso-200 resize-none" placeholder="Tell us what you think..."></textarea>
+                      </div>
+                      <button type="submit" className="w-full btn-gold py-4 text-xs shadow-gold mt-4">
+                        SUBMIT REVIEW
+                      </button>
+                    </form>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Display Reviews List */}
+            <div className="space-y-8 max-w-4xl mx-auto">
+              {reviews.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="font-inter text-espresso-300">Be the first to review this product!</p>
+                </div>
+              ) : (
+                <div className="grid gap-6">
+                  {reviews.map(r => (
+                    <div key={r.id} className="border-b border-gold-400/10 pb-6 last:border-0">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <div className="flex gap-1 mb-2">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className={cn("w-4 h-4", i < r.rating ? "fill-gold-400 text-gold-400" : "text-gray-300")} />
+                            ))}
+                          </div>
+                          <h4 className="font-inter font-bold text-sm text-espresso mb-1">{r.title}</h4>
+                        </div>
+                        <span className="font-inter text-xs text-espresso-200">
+                          {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </div>
+                      <p className="font-inter text-sm text-espresso-400 mb-3 leading-relaxed">
+                        {r.content}
+                      </p>
+                      <p className="font-inter font-medium text-xs text-espresso">
+                        {r.customer_name} <span className="text-espresso-200 font-normal ml-2">Verified Buyer</span>
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
