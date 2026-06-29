@@ -7,10 +7,12 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus, ShoppingBag, ArrowRight } from 'lucide-react';
+import { X, Minus, Plus, ShoppingBag, ArrowRight, Truck } from 'lucide-react';
 import { useCartStore } from '@/store/cart-store';
-import { formatPrice, SHIPPING_CONFIG } from '@/lib/utils';
+import { formatPrice } from '@/lib/utils';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 import toast from 'react-hot-toast';
 
 export default function CartDrawer() {
@@ -24,6 +26,9 @@ export default function CartDrawer() {
   } = useCartStore();
 
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const { settings } = useStoreSettings();
+  
   useEffect(() => setMounted(true), []);
 
   // Prevent background scroll when cart is open
@@ -57,12 +62,12 @@ export default function CartDrawer() {
     if (!user) {
       toast.error('Please sign in to proceed to checkout');
       closeCart();
-      window.location.href = '/auth/login?redirect=/checkout';
+      router.push('/auth/login?redirect=/checkout');
       return;
     }
 
     closeCart();
-    window.location.href = '/checkout';
+    router.push('/checkout');
   };
 
   return (
@@ -105,10 +110,13 @@ export default function CartDrawer() {
             </div>
 
             {/* Free Shipping Message */}
-            <div className="flex-shrink-0 p-4 bg-ivory-50/50 border-b border-gold-400/10 text-center">
-              <p className="font-inter text-sm text-espresso-300">
-                <span className="font-bold text-gold-600">Free Delivery</span> across Tamil Nadu. ₹99 for other states.
-              </p>
+            <div className="bg-pearl-100/50 p-4 border-b border-gold-400/20">
+              <div className="flex items-center gap-2 mb-2">
+                <Truck className="w-4 h-4 text-gold-500" />
+                <p className="text-xs font-inter text-espresso-200">
+                  Free Shipping Across {settings?.free_shipping_state || 'India'}
+                </p>
+              </div>
             </div>
 
             {/* Cart Items — scrollable area */}

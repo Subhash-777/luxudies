@@ -4,12 +4,13 @@
 
 'use client';
 
+import { useStoreSettings } from '@/hooks/useStoreSettings';
+
 export default function AnnouncementBar() {
-  const announcements = [
-    "Free Delivery Across Tamil Nadu • ₹99 for Other States",
-    "Extra 10% off on your first order — Use code LUXE10",
-    "Anti-Tarnish • Lightweight • Premium Quality"
-  ];
+  const { settings } = useStoreSettings();
+  const announcements = settings.announcement_quotes.filter(q => q.trim());
+
+  if (announcements.length === 0) return null;
 
   return (
     <div className="bg-pearl-100 border-b border-gold-400/20 text-espresso text-[11px] font-inter font-medium tracking-widest uppercase overflow-hidden whitespace-nowrap h-8 flex items-center">
@@ -18,7 +19,7 @@ export default function AnnouncementBar() {
         {[...announcements, ...announcements].map((text, i) => (
           <div key={i} className="flex items-center">
             <span className="px-6">{text}</span>
-            <span className="w-1 h-1 rounded-full bg-gold-400 mx-2" />
+            <span className="w-1 h-1 rounded-full bg-gold-400 mx-2 shrink-0" />
           </div>
         ))}
       </div>

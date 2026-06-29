@@ -5,11 +5,15 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 
 export default function WhatsAppFAB() {
-  const WHATSAPP_NUMBER = '919876543210';
-  const WHATSAPP_MESSAGE = encodeURIComponent("Hi LUXUDIES! I need some help.");
+  const { settings } = useStoreSettings();
+  const WHATSAPP_NUMBER = settings.whatsapp.replace(/\D/g, ''); // Ensure digits only
+  const WHATSAPP_MESSAGE = encodeURIComponent(`Hi ${settings.store_name}! I need some help.`);
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
+
+  if (!WHATSAPP_NUMBER) return null;
 
   return (
     <motion.div

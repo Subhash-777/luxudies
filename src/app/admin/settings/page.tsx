@@ -23,7 +23,7 @@ interface StoreSettings {
   shipping_cost_other: number;
   min_delivery_days: number;
   max_delivery_days: number;
-  announcement_bar: string;
+  announcement_quotes: string[];
   instagram_url: string;
   facebook_url: string;
 }
@@ -37,7 +37,10 @@ const defaultSettings: StoreSettings = {
   shipping_cost_other: 99,
   min_delivery_days: 3,
   max_delivery_days: 7,
-  announcement_bar: 'Extra 10% off on your first order • Use code LUXFIRST',
+  announcement_quotes: [
+    'Extra 10% off on your first order • Use code LUXFIRST',
+    'Free Delivery Across Tamil Nadu • ₹99 for Other States'
+  ],
   instagram_url: '',
   facebook_url: '',
 };
@@ -79,7 +82,9 @@ export default function AdminSettingsPage() {
             shipping_cost_other: data.shipping_cost_other ?? defaultSettings.shipping_cost_other,
             min_delivery_days: data.min_delivery_days ?? defaultSettings.min_delivery_days,
             max_delivery_days: data.max_delivery_days ?? defaultSettings.max_delivery_days,
-            announcement_bar: data.announcement_bar ?? defaultSettings.announcement_bar,
+            announcement_quotes: Array.isArray(data.announcement_quotes) && data.announcement_quotes.length > 0 
+              ? data.announcement_quotes 
+              : defaultSettings.announcement_quotes,
             instagram_url: data.instagram_url ?? '',
             facebook_url: data.facebook_url ?? '',
           });
@@ -121,6 +126,28 @@ export default function AdminSettingsPage() {
 
   const setNum = (field: keyof StoreSettings) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setSettings((prev) => ({ ...prev, [field]: Number(e.target.value) }));
+
+  const addQuote = () => {
+    setSettings((prev) => ({
+      ...prev,
+      announcement_quotes: [...prev.announcement_quotes, '']
+    }));
+  };
+
+  const updateQuote = (index: number, value: string) => {
+    setSettings((prev) => {
+      const newQuotes = [...prev.announcement_quotes];
+      newQuotes[index] = value;
+      return { ...prev, announcement_quotes: newQuotes };
+    });
+  };
+
+  const removeQuote = (index: number) => {
+    setSettings((prev) => ({
+      ...prev,
+      announcement_quotes: prev.announcement_quotes.filter((_, i) => i !== index)
+    }));
+  };
 
   if (isLoading) {
     return (
@@ -201,16 +228,51 @@ export default function AdminSettingsPage() {
             <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
               <Bell className="w-4 h-4 text-blue-600" />
             </div>
-            <h2 className="font-inter font-semibold text-gray-900">Announcement Bar</h2>
+            <div className="flex-1">
+              <h2 className="font-inter font-semibold text-gray-900">Announcement Bar Quotes</h2>
+              <p className="text-xs font-inter text-gray-500 mt-0.5">These will scroll across the top of your website.</p>
+            </div>
+            <button
+              onClick={addQuote}
+              className="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-xs font-inter font-semibold transition-colors"
+            >
+              + Add Quote
+            </button>
           </div>
-          <div>
-            <label className={labelClasses}>Banner Text (shown at top of site)</label>
-            <input type="text" value={settings.announcement_bar} onChange={set('announcement_bar')} className={inputClasses}
-              placeholder="e.g. Free shipping on orders over ₹999" />
+          
+          <div className="space-y-3">
+            {settings.announcement_quotes.map((quote, index) => (
+              <div key={index} className="flex gap-2">
+                <input 
+                  type="text" 
+                  value={quote} 
+                  onChange={(e) => updateQuote(index, e.target.value)} 
+                  className={inputClasses}
+                  placeholder="e.g. Free shipping on orders over ₹999" 
+                />
+                <button
+                  onClick={() => removeQuote(index)}
+                  disabled={settings.announcement_quotes.length <= 1}
+                  className="w-11 h-11 flex items-center justify-center shrink-0 border border-red-200 text-red-500 rounded-xl hover:bg-red-50 transition-colors disabled:opacity-40 disabled:hover:bg-transparent"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ))}
           </div>
-          {settings.announcement_bar && (
-            <div className="mt-3 px-4 py-2 bg-gray-900 rounded-lg text-center text-white text-xs font-inter truncate">
-              {settings.announcement_bar}
+          
+          {settings.announcement_quotes.filter(q => q.trim()).length > 0 && (
+            <div className="mt-5 px-4 py-3 bg-gray-900 rounded-xl flex items-center overflow-hidden">
+              <div className="animate-[marquee_10s_linear_infinite] flex items-center whitespace-nowrap min-w-full text-white text-xs font-inter uppercase tracking-wider">
+                {[...settings.announcement_quotes.filter(q => q.trim()), ...settings.announcement_quotes.filter(q => q.trim())].map((text, i) => (
+                  <div key={i} className="flex items-center">
+                    <span className="px-6">{text}</span>
+                    <span className="w-1 h-1 rounded-full bg-amber-400 mx-2 shrink-0" />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </motion.div>

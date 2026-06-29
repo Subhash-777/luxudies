@@ -14,11 +14,13 @@ import MobileNav from '@/components/layout/mobile-nav';
 import Footer from '@/components/layout/footer';
 import Button from '@/components/ui/button';
 import GlassCard from '@/components/ui/glass-card';
-import { getWhatsAppUrl, SHIPPING_CONFIG } from '@/lib/utils';
+import { getWhatsAppUrl } from '@/lib/utils';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get('order') || 'LXD-XXXX';
+  const { settings } = useStoreSettings();
 
   return (
     <main className="min-h-screen flex items-center justify-center py-12">
@@ -74,7 +76,7 @@ function SuccessContent() {
                 <span className="text-espresso-200">Estimated Delivery</span>
                 <span className="font-medium text-espresso flex items-center gap-1">
                   <Truck className="w-3.5 h-3.5 text-gold-400" />
-                  {SHIPPING_CONFIG.estimatedDays.min}-{SHIPPING_CONFIG.estimatedDays.max} business days
+                  {settings.min_delivery_days}-{settings.max_delivery_days} business days
                 </span>
               </div>
             </motion.div>

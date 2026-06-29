@@ -20,6 +20,7 @@ import { formatPrice } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { createClient } from '@/lib/supabase/client';
 import { INDIA_STATES, STATE_CITY_MAP } from '@/lib/locations';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 
 interface AddressForm {
   fullName: string;
@@ -35,6 +36,7 @@ interface AddressForm {
 
 export default function CheckoutPage() {
   const { items, getSubtotal, getTotal, getShipping, clearCart } = useCartStore();
+  const { settings } = useStoreSettings();
   const [isProcessing, setIsProcessing] = useState(false);
   const [customCity, setCustomCity] = useState('');
   const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
@@ -207,9 +209,9 @@ export default function CheckoutPage() {
     }
   };
 
-  const shipping = getShipping(address.state);
   const subtotal = getSubtotal();
-  const total = getTotal(address.state);
+  const shipping = getShipping(address.state, settings?.free_shipping_state, settings?.shipping_cost_other);
+  const total = getTotal(address.state, settings?.free_shipping_state, settings?.shipping_cost_other);
   const isFreeShipping = shipping === 0;
 
   const inputCls =
@@ -465,11 +467,17 @@ export default function CheckoutPage() {
                     ? 'bg-green-50 text-green-700 border border-green-100'
                     : 'bg-amber-50 text-amber-700 border border-amber-100'
                 }`}>
-                  <Truck className="w-4 h-4 flex-shrink-0" />
-                  {isFreeShipping
-                    ? '🎉 Free delivery across Tamil Nadu!'
-                    : '🚚 ₹99 delivery charge applies for orders outside Tamil Nadu'
-                  }
+                  {isFreeShipping ? (
+                    <>
+                      <Truck className="w-4 h-4 flex-shrink-0" />
+                      🎉 Free delivery across {settings?.free_shipping_state || 'Tamil Nadu'}!
+                    </>
+                  ) : (
+                    <>
+                      <Truck className="w-4 h-4 mt-0.5 shrink-0" />
+                      <span>₹{settings?.shipping_cost_other || 99} delivery charge applies for orders outside {settings?.free_shipping_state || 'Tamil Nadu'}</span>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>

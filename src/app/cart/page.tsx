@@ -4,6 +4,7 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,10 +17,19 @@ import WhatsAppFAB from '@/components/home/whatsapp-fab';
 import Button from '@/components/ui/button';
 import GlassCard from '@/components/ui/glass-card';
 import { useCartStore } from '@/store/cart-store';
-import { formatPrice, SHIPPING_CONFIG } from '@/lib/utils';
+import { formatPrice } from '@/lib/utils';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, getSubtotal, getTotal, clearCart } = useCartStore();
+  const { settings } = useStoreSettings();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   if (items.length === 0) {
     return (
@@ -203,7 +213,7 @@ export default function CartPage() {
                 <div className="flex items-center gap-2 p-3 bg-green-50 rounded-xl mb-6">
                   <Truck className="w-4 h-4 text-green-600 shrink-0" />
                   <p className="text-xs font-inter text-green-700">
-                    {SHIPPING_CONFIG.message}
+                    Free Shipping Across {settings.free_shipping_state}
                   </p>
                 </div>
 

@@ -59,9 +59,23 @@ export async function POST(request: NextRequest) {
       validatedItems.push({ ...item, price: itemPrice });
     }
 
-    // ── 5. Shipping cost ──────────────────────────────────────────
-    const isTamilNadu = address.state?.trim().toLowerCase() === 'tamil nadu';
-    const trueShippingCost = isTamilNadu ? 0 : 99;
+    // ── 5. Shipping cost (fetch from store_settings) ─────────────────
+    let trueShippingCost = 99; // fallback
+    let freeState = 'tamil nadu'; // fallback
+    
+    const { data: settings } = await supabaseAdmin
+      .from('store_settings')
+      .select('free_shipping_state, shipping_cost_other')
+      .eq('id', 'singleton')
+      .single();
+      
+    if (settings) {
+      trueShippingCost = settings.shipping_cost_other;
+      freeState = settings.free_shipping_state.toLowerCase();
+    }
+    
+    const isFreeState = address.state?.trim().toLowerCase() === freeState;
+    trueShippingCost = isFreeState ? 0 : trueShippingCost;
     const trueTotal = trueSubtotal + trueShippingCost;
 
     // ── 6. Save pending order ─────────────────────────────────────

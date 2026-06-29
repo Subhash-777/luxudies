@@ -33,8 +33,8 @@ interface CartStore {
   // Computed
   getItemCount: () => number;
   getSubtotal: () => number;
-  getShipping: (state?: string) => number;
-  getTotal: (state?: string) => number;
+  getShipping: (state?: string, freeShippingState?: string, shippingCostOther?: number) => number;
+  getTotal: (state?: string, freeShippingState?: string, shippingCostOther?: number) => number;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -231,16 +231,15 @@ export const useCartStore = create<CartStore>()(
         }, 0);
       },
 
-      getShipping: (state?: string) => {
-        // Free shipping across Tamil Nadu
-        if (state && state.trim().toLowerCase() !== 'tamil nadu') {
-          return 99;
+      getShipping: (state?: string, freeShippingState = 'tamil nadu', shippingCostOther = 99) => {
+        if (state && state.trim().toLowerCase() !== freeShippingState.trim().toLowerCase()) {
+          return shippingCostOther;
         }
         return 0;
       },
 
-      getTotal: (state?: string) => {
-        return get().getSubtotal() + get().getShipping(state);
+      getTotal: (state?: string, freeShippingState = 'tamil nadu', shippingCostOther = 99) => {
+        return get().getSubtotal() + get().getShipping(state, freeShippingState, shippingCostOther);
       },
     }),
     {

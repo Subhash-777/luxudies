@@ -205,7 +205,6 @@ export default function ProductFormModal({ isOpen, onClose, product, onSuccess }
               <option value="earrings">Earrings</option>
               <option value="bracelets">Bracelets</option>
               <option value="rings">Rings</option>
-              <option value="combos">Combos</option>
             </select>
           </div>
         </div>
