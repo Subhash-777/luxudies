@@ -2,7 +2,7 @@
 // LUXUDIES - Paytm Server Configuration
 // ============================================
 
-import PaytmChecksum from 'paytmchecksum';
+const PaytmChecksum = require('paytmchecksum');
 
 /**
  * Paytm Configuration Interface
@@ -57,9 +57,9 @@ export const generateChecksum = async (params: any, merchantKey: string): Promis
   try {
     const checksum = await PaytmChecksum.generateSignature(JSON.stringify(params), merchantKey);
     return checksum;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating Paytm checksum:', error);
-    throw new Error('Failed to generate checksum');
+    throw new Error(`Checksum Error: ${error?.message || 'Unknown error'}`);
   }
 };
 
